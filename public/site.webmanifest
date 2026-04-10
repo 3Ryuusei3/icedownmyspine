@@ -1,0 +1,17 @@
+{
+  "name": "Hielo por la espalda",
+  "short_name": "Hielo espalda",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "lang": "es"
+}
