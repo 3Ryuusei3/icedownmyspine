@@ -70,9 +70,9 @@ export function GroundingGame(
 
   if (done) {
     return (
-      <div className="flex flex-col gap-4 text-center">
+      <div className="flex flex-col gap-4 max-sm:gap-2 text-center">
         <Progress value={100} className="h-2" />
-        <p className="text-muted-foreground text-sm leading-relaxed">
+        <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
           Has completado el recorrido 5-4-3-2-1. Estás aquí, en el presente.
           Puedes quedarte un momento respirando despacio o repetir el ejercicio
           si te ayuda.
@@ -80,7 +80,7 @@ export function GroundingGame(
         <Button
           type="button"
           variant="secondary"
-          className="min-h-11 w-full"
+          className="min-h-10 w-full sm:min-h-11"
           onClick={() => {
             setStepIndex(0)
             setValues({})
@@ -94,15 +94,15 @@ export function GroundingGame(
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 max-sm:gap-2">
       <Progress value={progress} className="h-2" />
       <div>
-        <h3 className="text-lg font-medium">{step.title}</h3>
-        <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+        <h3 className="text-base font-medium sm:text-lg">{step.title}</h3>
+        <p className="text-muted-foreground mt-1 max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
           {step.hint}
         </p>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 max-sm:gap-2">
         {step.placeholders.map((ph, i) => (
           <div key={fieldId(i)} className="space-y-1.5">
             <Label htmlFor={fieldId(i)} className="sr-only">
@@ -118,13 +118,13 @@ export function GroundingGame(
                   [fieldId(i)]: e.target.value,
                 }))
               }
-              className="min-h-11 text-base"
+              className="min-h-10 sm:min-h-11"
               autoComplete="off"
             />
           </div>
         ))}
       </div>
-      <Button type="button" className="min-h-11 w-full" onClick={next}>
+      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={next}>
         {stepIndex < STEPS.length - 1 ? "Siguiente" : "Terminar"}
       </Button>
     </div>

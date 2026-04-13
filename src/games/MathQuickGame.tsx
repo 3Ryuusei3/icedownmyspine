@@ -104,8 +104,8 @@ export function MathQuickGame({ onWin }: GameProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-muted-foreground text-sm leading-relaxed">
+    <div className="flex flex-col gap-4 max-sm:gap-2">
+      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
         Solo multiplicaciones y divisiones (divisor 3, 4 o 5; dividendo a partir
         de 90). Elige el tipo de operaciones (se conserva al volver a jugar):
       </p>
@@ -142,7 +142,7 @@ export function MathQuickGame({ onWin }: GameProps) {
           Solo divisiones
         </Button>
       </div>
-      <p className="text-center text-2xl font-medium tabular-nums">
+      <p className="text-center text-xl font-medium tabular-nums sm:text-2xl">
         {puzzle.prompt}
         <span className="text-muted-foreground"> = ?</span>
       </p>
@@ -158,7 +158,7 @@ export function MathQuickGame({ onWin }: GameProps) {
             setValue(e.target.value)
             setFeedback(null)
           }}
-          className="min-h-11 text-base"
+          className="min-h-10 sm:min-h-11"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault()
@@ -168,7 +168,7 @@ export function MathQuickGame({ onWin }: GameProps) {
           }}
         />
       </div>
-      <Button type="button" className="min-h-11 w-full" onClick={check}>
+      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         Comprobar
       </Button>
       {feedback === "bad" && (

@@ -143,19 +143,19 @@ export function CountShapesGame({ onWin }: GameProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-muted-foreground text-sm leading-relaxed">
+    <div className="flex flex-col gap-4 max-sm:gap-2">
+      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
         {round.target.question} Cuenta solo ese emoji e ignora el resto.
       </p>
       <div
-        className="border-border bg-muted/30 relative mx-auto aspect-[4/3] w-full max-w-md overflow-hidden rounded-xl border"
+        className="border-border bg-muted/30 relative mx-auto aspect-[3/2] w-full max-w-md overflow-hidden rounded-xl border sm:aspect-[4/3]"
         role="img"
         aria-label="Área con emojis para contar"
       >
         {round.placed.map((p) => (
           <span
             key={p.key}
-            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none text-2xl leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] sm:text-3xl dark:drop-shadow-[0_1px_3px_rgba(0,0,0,0.75)]"
+            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none text-lg leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] sm:text-3xl dark:drop-shadow-[0_1px_3px_rgba(0,0,0,0.75)]"
             style={{ left: p.style.left, top: p.style.top }}
             aria-hidden
           >
@@ -175,7 +175,7 @@ export function CountShapesGame({ onWin }: GameProps) {
             setValue(e.target.value)
             setFeedback(null)
           }}
-          className="min-h-11 text-base"
+          className="min-h-10 sm:min-h-11"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault()
@@ -185,7 +185,7 @@ export function CountShapesGame({ onWin }: GameProps) {
           }}
         />
       </div>
-      <Button type="button" className="min-h-11 w-full" onClick={check}>
+      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         Comprobar
       </Button>
       {feedback === "bad" && (

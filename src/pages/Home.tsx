@@ -75,36 +75,38 @@ export function Home() {
 
   return (
     <div className="bg-background text-foreground flex min-h-svh flex-col">
-      <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-10">
-        <header className="mb-6 flex shrink-0 flex-wrap items-start justify-between gap-4">
+      <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col px-3 py-3 sm:px-6 sm:py-10">
+        <header className="mb-3 flex shrink-0 flex-wrap items-start justify-between gap-2 sm:mb-6 sm:gap-4">
           <div className="min-w-0 flex-1 text-left">
-            <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              Hielo por la espalda
+            <h1 className="text-balance text-xl font-semibold tracking-tight sm:text-3xl">
+              Ice Down Your Spine
             </h1>
-            <p className="text-muted-foreground mt-2 max-w-md text-pretty text-sm leading-relaxed">
-              Minijuegos sencillos para desviar la atención cuando sientes
-              ansiedad u obsesión. No hay puntuación ni prisa.
+            <p className="text-muted-foreground mt-1 max-w-md text-pretty text-xs leading-snug sm:mt-2 sm:text-sm sm:leading-relaxed">
+              Minijuegos sencillos para desviar la atención. No hay puntuación
+              ni prisa.
             </p>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
             <ModeToggle />
           </div>
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto [-webkit-overflow-scrolling:touch]">
-          <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-4 py-2">
-            <Card className="border-border/60 bg-muted/50 shrink-0 shadow-sm dark:bg-muted/25">
-              <CardHeader className="space-y-1 pb-4">
-                <CardTitle className="text-xl">{game.title}</CardTitle>
-                <CardDescription className="text-muted-foreground leading-relaxed">
+          <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-2 py-1 sm:gap-4 sm:py-2">
+            <Card className="border-border/60 bg-muted/50 max-sm:gap-2 max-sm:py-3 shrink-0 shadow-sm dark:bg-muted/25 sm:gap-4 sm:py-4">
+              <CardHeader className="space-y-1 max-sm:px-3 max-sm:pb-2 pb-4 sm:px-4">
+                <CardTitle className="text-lg sm:text-xl">
+                  {game.title}
+                </CardTitle>
+                <CardDescription className="text-muted-foreground max-sm:text-xs max-sm:leading-snug leading-relaxed">
                   {game.description}
                 </CardDescription>
               </CardHeader>
             </Card>
-            <Card className="shrink-0 overflow-hidden shadow-sm">
-              <CardContent className="">
-                <div className="flex flex-col items-center px-2 py-2">
+            <Card className="max-sm:gap-2 max-sm:py-3 shrink-0 overflow-hidden shadow-sm sm:gap-4 sm:py-4">
+              <CardContent className="max-sm:px-3 sm:px-4">
+                <div className="flex flex-col items-center px-1 py-1 sm:px-2 sm:py-2">
                   <div className="w-full max-w-full">
                     <GameComponent
                       key={`${gameId}-${session}-${replayNonce}`}
@@ -117,21 +119,23 @@ export function Home() {
           </div>
         </div>
 
-        <div className="mt-6 flex shrink-0 flex-col gap-2 sm:flex-row sm:gap-3">
+        <div className="mt-3 flex shrink-0 flex-row gap-2 sm:mt-6 sm:gap-3">
           <Button
             type="button"
             variant="secondary"
-            className="min-h-11 w-full sm:flex-1"
+            className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
             onClick={replayCurrentGame}
+            aria-label="Volver a jugar a este juego"
           >
-            Volver a jugar a este juego
+            Repetir juego
           </Button>
           <Button
             type="button"
-            className="min-h-11 w-full sm:flex-1"
+            className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
             onClick={swapGame}
+            aria-label="Jugar a otro juego"
           >
-            Jugar a otro juego
+            Jugar a otro
           </Button>
         </div>
       </div>
@@ -151,25 +155,27 @@ export function Home() {
             </DialogDescription>
           </DialogHeader>
           {winSolution !== null ? (
-            <h3 className="text-balance whitespace-pre-line px-2 text-center text-lg leading-snug font-semibold text-emerald-600 dark:text-emerald-400">
+            <h3 className="text-balance whitespace-pre-line px-2 text-center text-base leading-snug font-semibold text-emerald-600 sm:text-lg dark:text-emerald-400">
               {winSolution}
             </h3>
           ) : null}
-          <div className="flex flex-col gap-2 pt-2">
+          <div className="flex flex-row gap-2 pt-2">
             <Button
               type="button"
               variant="secondary"
-              className="min-h-11 w-full"
+              className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
               onClick={replaySameGame}
+              aria-label="Volver a jugar a este juego"
             >
-              Volver a jugar a este juego
+              Repetir
             </Button>
             <Button
               type="button"
-              className="min-h-11 w-full"
+              className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
               onClick={playAnotherGame}
+              aria-label="Jugar a otro juego"
             >
-              Jugar a otro juego
+              Otro
             </Button>
           </div>
         </DialogContent>

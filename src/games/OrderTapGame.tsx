@@ -76,8 +76,8 @@ export function OrderTapGame({ onWin }: GameProps) {
   const gridLabel = `Cuadrícula del ${round.start} al ${round.end}`
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-muted-foreground text-sm leading-relaxed">
+    <div className="flex flex-col gap-4 max-sm:gap-2">
+      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
         Pulsa los números del <strong>{round.start}</strong> al{" "}
         <strong>{round.end}</strong> en orden (16 números seguidos entre 1 y
         100). Si te equivocas, vuelves a empezar desde el {round.start} (los
@@ -95,7 +95,7 @@ export function OrderTapGame({ onWin }: GameProps) {
           : `Siguiente: ${nextExpected}`}
       </p>
       <div
-        className="mx-auto grid w-full max-w-xs grid-cols-4 gap-2 sm:max-w-sm sm:gap-3"
+        className="mx-auto grid w-full max-w-xs grid-cols-4 gap-1.5 sm:max-w-sm sm:gap-3"
         role="grid"
         aria-label={gridLabel}
       >
@@ -110,7 +110,7 @@ export function OrderTapGame({ onWin }: GameProps) {
               aria-label={`Número ${n}${isDone ? ", ya acertado" : ""}`}
               onClick={() => onCell(n)}
               className={cn(
-                "border-border flex aspect-square min-h-[3.25rem] items-center justify-center rounded-xl border-2 text-lg font-semibold tabular-nums transition-colors active:scale-[0.98] sm:min-h-16 sm:text-xl",
+                "border-border flex aspect-square min-h-[2.75rem] items-center justify-center rounded-xl border-2 text-base font-semibold tabular-nums transition-colors active:scale-[0.98] sm:min-h-16 sm:text-xl",
                 isDone &&
                   "border-emerald-600/50 bg-emerald-600/15 text-emerald-800 dark:border-emerald-500/50 dark:bg-emerald-500/20 dark:text-emerald-100",
                 !isDone && "bg-card hover:bg-muted/70",

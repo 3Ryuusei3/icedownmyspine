@@ -30,12 +30,12 @@ export function SequenceGame({ onWin }: GameProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-muted-foreground text-sm leading-relaxed">
+    <div className="flex flex-col gap-4 max-sm:gap-2">
+      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
         ¿Qué número sigue? El patrón puede ser una suma fija, saltos que
         alternan, cuadrados, productos… Tómate un momento para mirar la serie.
       </p>
-      <p className="text-center font-mono text-lg tracking-wide">
+      <p className="text-center font-mono text-base tracking-wide sm:text-lg">
         {sequenceText}
       </p>
       <div className="space-y-2">
@@ -50,7 +50,7 @@ export function SequenceGame({ onWin }: GameProps) {
             setValue(e.target.value)
             setFeedback(null)
           }}
-          className="min-h-11 text-base"
+          className="min-h-10 sm:min-h-11"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault()
@@ -60,7 +60,7 @@ export function SequenceGame({ onWin }: GameProps) {
           }}
         />
       </div>
-      <Button type="button" className="min-h-11 w-full" onClick={check}>
+      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         Comprobar
       </Button>
       {feedback === "bad" && (

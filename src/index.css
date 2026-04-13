@@ -131,4 +131,14 @@ html {
   html {
     @apply font-sans;
   }
+  @media (max-width: 639px) {
+    html {
+      font-size: 93.75%;
+    }
+    /* Evita zoom por doble toque al pulsar botones (p. ej. Firefox móvil). */
+    button,
+    [role="button"] {
+      touch-action: manipulation;
+    }
+  }
 }

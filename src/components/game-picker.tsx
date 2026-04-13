@@ -26,10 +26,10 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
           type="button"
           variant="outline"
           size="icon-lg"
-          className="min-h-11 min-w-11 shrink-0"
+          className="size-9 min-h-9 min-w-9 shrink-0 sm:size-11 sm:min-h-11 sm:min-w-11"
           aria-label="Elegir minijuego"
         >
-          <LayoutGrid className="size-5" aria-hidden />
+          <LayoutGrid className="size-4 sm:size-5" aria-hidden />
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -42,13 +42,13 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
             Elige uno; se cargará una partida nueva.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
           {GAMES.map((g) => (
             <Button
               key={g.id}
               type="button"
               variant={g.id === currentId ? "secondary" : "outline"}
-              className="min-h-16 h-auto flex-col gap-1 whitespace-normal py-3 px-2 text-center text-sm leading-tight font-medium"
+              className="min-h-14 h-auto flex-col gap-0.5 whitespace-normal px-2 py-2 text-center text-xs leading-tight font-medium sm:min-h-16 sm:gap-1 sm:py-3 sm:text-sm"
               onClick={() => {
                 onSelect(g.id)
                 setOpen(false)

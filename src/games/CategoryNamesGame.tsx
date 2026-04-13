@@ -80,15 +80,17 @@ export function CategoryNamesGame({ onWin }: GameProps) {
   }
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-4 max-sm:gap-2">
       <div>
-        <p className="text-foreground font-medium">{prompt.instruction}</p>
-        <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+        <p className="text-foreground max-sm:text-sm font-medium">
+          {prompt.instruction}
+        </p>
+        <p className="text-muted-foreground mt-1 max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
           No hay respuestas incorrectas: lo importante es nombrar tres cosas.
         </p>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 max-sm:gap-2">
         <div className="space-y-1.5">
           <Label htmlFor="cat-1">1</Label>
           <Input
@@ -98,7 +100,7 @@ export function CategoryNamesGame({ onWin }: GameProps) {
               setA(e.target.value)
               setSubmitHint(false)
             }}
-            className="min-h-11 text-base"
+            className="min-h-10 sm:min-h-11"
             autoComplete="off"
             placeholder="Primera…"
           />
@@ -112,7 +114,7 @@ export function CategoryNamesGame({ onWin }: GameProps) {
               setB(e.target.value)
               setSubmitHint(false)
             }}
-            className="min-h-11 text-base"
+            className="min-h-10 sm:min-h-11"
             autoComplete="off"
             placeholder="Segunda…"
           />
@@ -126,14 +128,14 @@ export function CategoryNamesGame({ onWin }: GameProps) {
               setC(e.target.value)
               setSubmitHint(false)
             }}
-            className="min-h-11 text-base"
+            className="min-h-10 sm:min-h-11"
             autoComplete="off"
             placeholder="Tercera…"
           />
         </div>
       </div>
 
-      <Button type="button" className="min-h-11 w-full" onClick={check}>
+      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         He puesto tres cosas
       </Button>
       {submitHint ? (

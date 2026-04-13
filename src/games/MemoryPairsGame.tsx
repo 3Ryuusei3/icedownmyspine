@@ -101,13 +101,13 @@ export function MemoryPairsGame({ onWin }: GameProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-muted-foreground text-sm leading-relaxed">
+    <div className="flex flex-col gap-4 max-sm:gap-2">
+      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
         Hay 8 parejas de emojis. Toca dos cartas para voltearlas; si coinciden
         se quedan descubiertas.
       </p>
       <div
-        className="mx-auto grid w-full max-w-sm grid-cols-4 gap-2 sm:max-w-md sm:gap-3"
+        className="mx-auto grid w-full max-w-sm grid-cols-4 gap-1.5 sm:max-w-md sm:gap-3"
         role="grid"
         aria-label="Cartas de memoria"
       >
@@ -128,7 +128,7 @@ export function MemoryPairsGame({ onWin }: GameProps) {
               disabled={matched.has(i)}
               onClick={() => onCardClick(i)}
               className={cn(
-                "flex aspect-square min-h-[3.25rem] items-center justify-center rounded-xl border-2 text-2xl transition-all duration-150 sm:min-h-16 sm:text-3xl",
+                "flex aspect-square min-h-[2.75rem] items-center justify-center rounded-xl border-2 text-xl transition-all duration-150 sm:min-h-16 sm:text-3xl",
                 matched.has(i)
                   ? "border-emerald-500/50 bg-emerald-500/10"
                   : "border-border bg-card hover:bg-muted/60 active:scale-[0.98]",

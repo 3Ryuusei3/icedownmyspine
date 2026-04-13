@@ -107,15 +107,15 @@ export function FollowDotGame({ onWin }: GameProps) {
   }, [])
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-muted-foreground text-sm leading-relaxed">
+    <div className="flex flex-col gap-4 max-sm:gap-2">
+      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
         El <strong className="text-foreground">punto azul</strong> se mueve.
         Con el dedo mueve el <strong className="text-foreground">punto verde</strong>{" "}
         para mantenerte cerca del azul. Si te acercas demasiado al borde rojo,
         se reinicia la barra de progreso.
       </p>
       <div
-        className="bg-muted/20 relative mx-auto h-56 w-full max-w-sm touch-none select-none overflow-hidden rounded-xl border-2 border-red-500/50 sm:h-64"
+        className="bg-muted/20 relative mx-auto h-44 w-full max-w-sm touch-none select-none overflow-hidden rounded-xl border-2 border-red-500/50 sm:h-64"
         ref={areaRef}
         role="application"
         aria-label="Zona: sigue el punto azul con el verde"

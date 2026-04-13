@@ -17,7 +17,7 @@ export function ModeToggle() {
         type="button"
         variant="outline"
         size="icon-lg"
-        className="min-h-11 min-w-11 shrink-0"
+        className="size-9 min-h-9 min-w-9 shrink-0 sm:size-11 sm:min-h-11 sm:min-w-11"
         disabled
         aria-hidden
       />
@@ -31,11 +31,15 @@ export function ModeToggle() {
       type="button"
       variant="outline"
       size="icon-lg"
-      className="min-h-11 min-w-11 shrink-0"
+      className="size-9 min-h-9 min-w-9 shrink-0 sm:size-11 sm:min-h-11 sm:min-w-11"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "Activar modo claro" : "Activar modo oscuro"}
     >
-      {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
+      {isDark ? (
+        <Sun className="size-4 sm:size-5" />
+      ) : (
+        <Moon className="size-4 sm:size-5" />
+      )}
     </Button>
   )
 }
