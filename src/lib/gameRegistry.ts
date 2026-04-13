@@ -41,13 +41,15 @@ export const GAMES: GameDefinition[] = [
   {
     id: "math",
     title: "Cuenta rápida",
-    description: "Operaciones sencillas para enfocarte.",
+    description:
+      "Multiplicaciones y divisiones enteras (divisor 3, 4 o 5; dividendo ≥ 90). Filtro: todo, solo × o solo ÷.",
     component: MathQuickGame,
   },
   {
     id: "count",
     title: "Contar emojis",
-    description: "Cada partida te pide un emoji distinto; hay entre 5 y 20.",
+    description:
+      "Cuenta un emoji entre muchos otros (5–20 objetivos); repartidos para poder distinguirlos.",
     component: CountShapesGame,
   },
   {
@@ -76,9 +78,9 @@ export const GAMES: GameDefinition[] = [
   },
   {
     id: "orderTap",
-    title: "1 al 16 en orden",
+    title: "16 números en orden",
     description:
-      "Toca del 1 al 16; un fallo reinicia la ronda (misma disposición).",
+      "Toca 16 números consecutivos (p. ej. del 21 al 36); un fallo reinicia desde el primero.",
     component: OrderTapGame,
   },
   {

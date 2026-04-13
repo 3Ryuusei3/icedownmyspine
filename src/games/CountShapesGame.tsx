@@ -44,13 +44,47 @@ const TARGET_TYPES = [
 
 const POOL = TARGET_TYPES.map((t) => t.emoji)
 
-function randomPosition(seed: number) {
-  const x = 6 + ((seed * 17) % 78)
-  const y = 5 + ((seed * 23) % 82)
-  return { left: `${x}%`, top: `${y}%` }
+/** 0–1 determinista a partir de semilla + índice (sin Math.random en render). */
+function unitHash(seed: number, index: number, salt: number) {
+  let h = (seed >>> 0) * 2654435761 + (index >>> 0) * 1597334677 + salt * 2246822519
+  h >>>= 0
+  return h / 0xffffffff
 }
 
-type PlacedEmoji = { emoji: string; key: string; style: { left: string; top: string } }
+/** Reparto en cuadrícula barajada: un emoji por celda, jitter pequeño ( roce entre vecinos, no montones). */
+const GRID_COLS = 16
+const GRID_ROWS = 12
+const GRID_SLOTS = GRID_COLS * GRID_ROWS
+
+function layoutGridPositions(seed: number, count: number) {
+  const slotOrder = shuffle(
+    Array.from({ length: GRID_SLOTS }, (_, i) => i),
+  ).slice(0, count)
+
+  const padX = 4.5
+  const padY = 4.5
+  const cellW = (100 - 2 * padX) / GRID_COLS
+  const cellH = (100 - 2 * padY) / GRID_ROWS
+  const jitterScale = 0.36
+
+  return slotOrder.map((slot, i) => {
+    const c = slot % GRID_COLS
+    const r = Math.floor(slot / GRID_COLS)
+    const cx = padX + (c + 0.5) * cellW
+    const cy = padY + (r + 0.5) * cellH
+    const jitterX = (unitHash(seed, i, 11) - 0.5) * cellW * jitterScale
+    const jitterY = (unitHash(seed, i, 17) - 0.5) * cellH * jitterScale
+    const x = Math.min(97, Math.max(3, cx + jitterX))
+    const y = Math.min(97, Math.max(3, cy + jitterY))
+    return { left: `${x}%`, top: `${y}%` }
+  })
+}
+
+type PlacedEmoji = {
+  emoji: string
+  key: string
+  style: { left: string; top: string }
+}
 
 export function CountShapesGame({ onWin }: GameProps) {
   const round = useStableRandom(() => {
@@ -58,9 +92,12 @@ export function CountShapesGame({ onWin }: GameProps) {
       TARGET_TYPES[Math.floor(Math.random() * TARGET_TYPES.length)]!
     const distractorPool = POOL.filter((e) => e !== target.emoji)
     const targetCount = randomInt(5, 20)
-    const decoyCount = randomInt(
-      Math.max(4, Math.floor(targetCount * 0.35)),
-      Math.max(6, Math.floor(targetCount * 0.75)),
+    const decoyCount = Math.min(
+      randomInt(
+        Math.max(48, Math.floor(targetCount * 4)),
+        Math.max(72, Math.floor(targetCount * 6)),
+      ),
+      GRID_SLOTS - targetCount,
     )
 
     const emojis: string[] = []
@@ -73,10 +110,11 @@ export function CountShapesGame({ onWin }: GameProps) {
     shuffle(emojis)
 
     const seed = randomInt(1, 999)
+    const positions = layoutGridPositions(seed, emojis.length)
     const placed: PlacedEmoji[] = emojis.map((emoji, i) => ({
       emoji,
       key: `e-${seed}-${i}-${emoji}`,
-      style: randomPosition(seed + i * 37),
+      style: positions[i]!,
     }))
 
     return {
@@ -117,7 +155,7 @@ export function CountShapesGame({ onWin }: GameProps) {
         {round.placed.map((p) => (
           <span
             key={p.key}
-            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none text-2xl leading-none sm:text-3xl"
+            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none text-2xl leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] sm:text-3xl dark:drop-shadow-[0_1px_3px_rgba(0,0,0,0.75)]"
             style={{ left: p.style.left, top: p.style.top }}
             aria-hidden
           >

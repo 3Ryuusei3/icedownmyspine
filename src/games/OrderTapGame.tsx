@@ -4,12 +4,33 @@ import type { GameProps } from "@/games/types"
 import { useStableRandom } from "@/hooks/use-stable-random"
 import { shuffle } from "@/lib/shuffle"
 
-const NUMBERS = Array.from({ length: 16 }, (_, i) => i + 1)
+function randomInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+type OrderRound = {
+  start: number
+  end: number
+  numbers: number[]
+  layout: number[]
+}
+
+function buildOrderRound(): OrderRound {
+  const start = randomInt(1, 85)
+  const end = start + 15
+  const numbers = Array.from({ length: 16 }, (_, i) => start + i)
+  return {
+    start,
+    end,
+    numbers,
+    layout: shuffle([...numbers]),
+  }
+}
 
 export function OrderTapGame({ onWin }: GameProps) {
-  const layout = useStableRandom(() => shuffle([...NUMBERS]))
+  const round = useStableRandom(() => buildOrderRound())
 
-  const [nextExpected, setNextExpected] = useState(1)
+  const [nextExpected, setNextExpected] = useState(round.start)
   const [completed, setCompleted] = useState<Set<number>>(() => new Set())
   const [wrongFlash, setWrongFlash] = useState(false)
   const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -29,18 +50,17 @@ export function OrderTapGame({ onWin }: GameProps) {
         clearTimeout(flashTimeoutRef.current)
         flashTimeoutRef.current = null
       }
-      if (n === 16) {
-        setCompleted(new Set(NUMBERS))
+      if (n === round.end) {
+        setCompleted(new Set(round.numbers))
         onWin?.({
-          solutionText:
-            "Orden correcto: has pulsado del 1 al 16 sin fallar en esta disposición.",
+          solutionText: `Orden correcto: del ${round.start} al ${round.end} sin fallar en esta disposición.`,
         })
       } else {
         setCompleted((prev) => new Set([...prev, n]))
         setNextExpected(n + 1)
       }
     } else {
-      setNextExpected(1)
+      setNextExpected(round.start)
       setCompleted(new Set())
       setWrongFlash(true)
       if (flashTimeoutRef.current !== null) {
@@ -53,12 +73,15 @@ export function OrderTapGame({ onWin }: GameProps) {
     }
   }
 
+  const gridLabel = `Cuadrícula del ${round.start} al ${round.end}`
+
   return (
     <div className="flex flex-col gap-4">
       <p className="text-muted-foreground text-sm leading-relaxed">
-        Pulsa los números del <strong>1</strong> al <strong>16</strong> en
-        orden. Si te equivocas, vuelves a empezar desde el 1 (los números no se
-        mueven). Los acertados se marcan en verde.
+        Pulsa los números del <strong>{round.start}</strong> al{" "}
+        <strong>{round.end}</strong> en orden (16 números seguidos entre 1 y
+        100). Si te equivocas, vuelves a empezar desde el {round.start} (los
+        números no se mueven). Los acertados se marcan en verde.
       </p>
       <p
         className={cn(
@@ -68,15 +91,15 @@ export function OrderTapGame({ onWin }: GameProps) {
         aria-live="polite"
       >
         {wrongFlash
-          ? "Orden incorrecto — empieza otra vez por el 1."
+          ? `Orden incorrecto — empieza otra vez por el ${round.start}.`
           : `Siguiente: ${nextExpected}`}
       </p>
       <div
         className="mx-auto grid w-full max-w-xs grid-cols-4 gap-2 sm:max-w-sm sm:gap-3"
         role="grid"
-        aria-label="Cuadrícula del 1 al 16"
+        aria-label={gridLabel}
       >
-        {layout.map((n, i) => {
+        {round.layout.map((n, i) => {
           const isDone = completed.has(n)
           const isNext = nextExpected === n && !isDone
           return (

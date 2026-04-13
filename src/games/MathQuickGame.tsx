@@ -1,23 +1,41 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { GameProps } from "@/games/types"
-import { useStableRandom } from "@/hooks/use-stable-random"
 
-type OpKind = "mul" | "half" | "add" | "sub"
+type MathQuickFilter = "all" | "mul" | "div"
+
+type MathPuzzle = { prompt: string; answer: number }
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-function pickOp(): OpKind {
-  const kinds: OpKind[] = ["mul", "half", "add", "sub"]
-  return kinds[randomInt(0, kinds.length - 1)]!
+const DIVISORS = [3, 4, 5] as const
+
+const FILTER_STORAGE_KEY = "icedownyourspine.mathQuickFilter"
+
+function readStoredFilter(): MathQuickFilter {
+  try {
+    const v = sessionStorage.getItem(FILTER_STORAGE_KEY)
+    if (v === "all" || v === "mul" || v === "div") return v
+  } catch {
+    /* private mode / no storage */
+  }
+  return "all"
+}
+
+function persistFilter(next: MathQuickFilter) {
+  try {
+    sessionStorage.setItem(FILTER_STORAGE_KEY, next)
+  } catch {
+    /* ignore */
+  }
 }
 
 /** Multiplicación con al menos un factor estrictamente mayor que 10. */
-function pickMultiplication(): { prompt: string; answer: number } {
+function pickMultiplication(): MathPuzzle {
   const variant = randomInt(0, 2)
   let a: number
   let b: number
@@ -37,39 +55,46 @@ function pickMultiplication(): { prompt: string; answer: number } {
   return { prompt: `${a} × ${b}`, answer: a * b }
 }
 
+/** Cociente entero; divisor 3, 4 o 5; dividendo ≥ 90. */
+function pickDivision(): MathPuzzle {
+  const divisor = DIVISORS[randomInt(0, DIVISORS.length - 1)]!
+  const minQ = Math.ceil(90 / divisor)
+  const maxQ = Math.floor(240 / divisor)
+  const quotient = randomInt(minQ, maxQ)
+  const dividend = quotient * divisor
+  return { prompt: `${dividend} ÷ ${divisor}`, answer: quotient }
+}
+
+function buildMathPuzzle(filter: MathQuickFilter): MathPuzzle {
+  if (filter === "mul") return pickMultiplication()
+  if (filter === "div") return pickDivision()
+  return Math.random() < 0.5 ? pickMultiplication() : pickDivision()
+}
+
 export function MathQuickGame({ onWin }: GameProps) {
-  const puzzle = useStableRandom(() => {
-    const op = pickOp()
-    switch (op) {
-      case "mul":
-        return pickMultiplication()
-      case "half": {
-        const n = randomInt(4, 40) * 2
-        return { prompt: `La mitad de ${n}`, answer: n / 2 }
-      }
-      case "add": {
-        const a = randomInt(5, 40)
-        const b = randomInt(5, 40)
-        return { prompt: `${a} + ${b}`, answer: a + b }
-      }
-      case "sub": {
-        const a = randomInt(20, 60)
-        const b = randomInt(5, a - 1)
-        return { prompt: `${a} − ${b}`, answer: a - b }
-      }
-    }
-  })
+  const [filter, setFilter] = useState<MathQuickFilter>(readStoredFilter)
+  const puzzle = useMemo(() => buildMathPuzzle(filter), [filter])
+
+  function setFilterAndPersist(next: MathQuickFilter) {
+    setFilter(next)
+    persistFilter(next)
+  }
 
   const [value, setValue] = useState("")
   const [feedback, setFeedback] = useState<"bad" | null>(null)
 
+  useEffect(() => {
+    setValue("")
+    setFeedback(null)
+  }, [filter])
+
   function check() {
-    const n = Number.parseFloat(value.trim().replace(",", "."))
+    const n = Number.parseInt(value.trim(), 10)
     if (Number.isNaN(n)) {
       setFeedback("bad")
       return
     }
-    if (Math.abs(n - puzzle.answer) < 1e-9) {
+    if (n === puzzle.answer) {
       onWin?.({
         solutionText: `${puzzle.prompt} = ${puzzle.answer}`,
       })
@@ -81,8 +106,42 @@ export function MathQuickGame({ onWin }: GameProps) {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-muted-foreground text-sm leading-relaxed">
-        Resuelve mentalmente y escribe el resultado.
+        Solo multiplicaciones y divisiones (divisor 3, 4 o 5; dividendo a partir
+        de 90). Elige el tipo de operaciones (se conserva al volver a jugar):
       </p>
+      <div
+        className="flex flex-wrap justify-center gap-2"
+        role="group"
+        aria-label="Tipo de operaciones"
+      >
+        <Button
+          type="button"
+          size="sm"
+          variant={filter === "all" ? "default" : "outline"}
+          className="min-h-9"
+          onClick={() => setFilterAndPersist("all")}
+        >
+          Todo
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={filter === "mul" ? "default" : "outline"}
+          className="min-h-9"
+          onClick={() => setFilterAndPersist("mul")}
+        >
+          Solo multiplicaciones
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={filter === "div" ? "default" : "outline"}
+          className="min-h-9"
+          onClick={() => setFilterAndPersist("div")}
+        >
+          Solo divisiones
+        </Button>
+      </div>
       <p className="text-center text-2xl font-medium tabular-nums">
         {puzzle.prompt}
         <span className="text-muted-foreground"> = ?</span>
@@ -91,7 +150,7 @@ export function MathQuickGame({ onWin }: GameProps) {
         <Label htmlFor="math-answer">Resultado</Label>
         <Input
           id="math-answer"
-          inputMode="decimal"
+          inputMode="numeric"
           autoComplete="off"
           placeholder="Número"
           value={value}
