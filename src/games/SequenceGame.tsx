@@ -52,7 +52,11 @@ export function SequenceGame({ onWin }: GameProps) {
           }}
           className="min-h-11 text-base"
           onKeyDown={(e) => {
-            if (e.key === "Enter") check()
+            if (e.key === "Enter") {
+              e.preventDefault()
+              e.stopPropagation()
+              check()
+            }
           }}
         />
       </div>

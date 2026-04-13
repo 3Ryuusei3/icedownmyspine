@@ -47,10 +47,12 @@ export function Home() {
 
   const handleWin = useCallback((payload?: WinPayload) => {
     const text = payload?.solutionText;
-    setWinSolution(
-      text === undefined || text === null || text === "" ? null : text,
-    );
-    setWinOpen(true);
+    const solution =
+      text === undefined || text === null || text === "" ? null : text;
+    queueMicrotask(() => {
+      setWinSolution(solution);
+      setWinOpen(true);
+    });
   }, []);
 
   const replayCurrentGame = useCallback(() => {
