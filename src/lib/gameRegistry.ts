@@ -1,5 +1,5 @@
 import type { ComponentType } from "react"
-import { AnagramGame } from "@/games/AnagramGame"
+import { MiniWosGame } from "@/games/MiniWosGame"
 import { CategoryNamesGame } from "@/games/CategoryNamesGame"
 import { CountShapesGame } from "@/games/CountShapesGame"
 import { CompareNumbersGame } from "@/games/CompareNumbersGame"
@@ -54,9 +54,10 @@ export const GAMES: GameDefinition[] = [
   },
   {
     id: "anagram",
-    title: "Anagrama",
-    description: "Ordena las letras para formar la palabra.",
-    component: AnagramGame,
+    title: "Mini-wos",
+    description:
+      "Forma todas las palabras posibles con las letras; rejilla por longitud y orden alfabético.",
+    component: MiniWosGame,
   },
   {
     id: "grounding",
