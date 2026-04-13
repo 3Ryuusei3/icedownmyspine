@@ -119,28 +119,28 @@ export function FollowDotGame({ onWin }: GameProps) {
         ref={areaRef}
         role="application"
         aria-label="Zona: sigue el punto azul con el verde"
-        onTouchStart={(e) => {
+        style={{ touchAction: "none" }}
+        onPointerDown={(e) => {
+          if (!e.isPrimary) return
+          if (e.pointerType === "mouse" && e.button !== 0) return
           e.preventDefault()
-          const x = e.touches[0]
-          if (x) touchToNorm(x.clientX, x.clientY)
-        }}
-        onTouchMove={(e) => {
-          e.preventDefault()
-          const x = e.touches[0]
-          if (x) touchToNorm(x.clientX, x.clientY)
-        }}
-        onMouseDown={(e) => {
-          if (e.button !== 0) return
-          const move = (ev: MouseEvent) => {
-            touchToNorm(ev.clientX, ev.clientY)
-          }
-          const up = () => {
-            window.removeEventListener("mousemove", move)
-            window.removeEventListener("mouseup", up)
-          }
+          e.currentTarget.setPointerCapture(e.pointerId)
           touchToNorm(e.clientX, e.clientY)
-          window.addEventListener("mousemove", move)
-          window.addEventListener("mouseup", up)
+        }}
+        onPointerMove={(e) => {
+          if (!e.currentTarget.hasPointerCapture(e.pointerId)) return
+          e.preventDefault()
+          touchToNorm(e.clientX, e.clientY)
+        }}
+        onPointerUp={(e) => {
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId)
+          }
+        }}
+        onPointerCancel={(e) => {
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId)
+          }
         }}
       >
         <div
