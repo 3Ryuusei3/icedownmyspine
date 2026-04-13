@@ -2,7 +2,7 @@ import type { ComponentType } from "react"
 import { AnagramGame } from "@/games/AnagramGame"
 import { CategoryNamesGame } from "@/games/CategoryNamesGame"
 import { CountShapesGame } from "@/games/CountShapesGame"
-import { FollowDotGame } from "@/games/FollowDotGame"
+import { CompareNumbersGame } from "@/games/CompareNumbersGame"
 import { GroundingGame } from "@/games/GroundingGame"
 import { MathQuickGame } from "@/games/MathQuickGame"
 import { MemoryPairsGame } from "@/games/MemoryPairsGame"
@@ -21,7 +21,7 @@ export type GameId =
   | "memory"
   | "orderTap"
   | "categoryNames"
-  | "followDot"
+  | "compareNumbers"
 
 export type GameDefinition = {
   id: GameId
@@ -91,11 +91,11 @@ export const GAMES: GameDefinition[] = [
     component: CategoryNamesGame,
   },
   {
-    id: "followDot",
-    title: "Seguir el punto",
+    id: "compareNumbers",
+    title: "¿Cuál es mayor?",
     description:
-      "Mueve el punto verde con el dedo siguiendo el azul sin acercarte al borde.",
-    component: FollowDotGame,
+      "Tres operaciones A, B y C: dos resultados parecidos y uno claramente menor; elige la mayor.",
+    component: CompareNumbersGame,
   },
 ]
 
