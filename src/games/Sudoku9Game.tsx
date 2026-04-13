@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { GameProps } from "@/games/types";
 import {
-  formatSudoku4Lines,
-  isValidCompletedSudoku4,
-  respectsSudokuGivens,
-} from "@/lib/sudoku4Validate";
-import { SUDOKU4_PUZZLES } from "@/lib/sudoku4Presets";
+  formatSudoku9Lines,
+  isValidCompletedSudoku9,
+  respectsSudoku9Givens,
+} from "@/lib/sudoku9Validate";
+import { pickSudoku9Puzzle } from "@/lib/sudoku9Presets";
+
+const SIZE = 9;
 
 function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -17,23 +19,19 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return out;
 }
 
-function pickPuzzle() {
-  return SUDOKU4_PUZZLES[Math.floor(Math.random() * SUDOKU4_PUZZLES.length)]!;
-}
-
-/** Último dígito 1–4 aunque el input envíe varios caracteres (sustitución en móvil). */
+/** Último dígito 1–9 aunque el input envíe varios caracteres (sustitución en móvil). */
 function parseCellDigit(raw: string): number | null {
   const digits = raw.replace(/\D/g, "");
   const last = digits.slice(-1);
   if (last === "") return null;
   const n = Number.parseInt(last, 10);
-  if (n >= 1 && n <= 4) return n;
+  if (n >= 1 && n <= 9) return n;
   return null;
 }
 
-export function Sudoku4Game({ onWin }: GameProps) {
+export function Sudoku9Game({ onWin }: GameProps) {
   const [{ puzzle, cells }, setPuzzleState] = useState(() => {
-    const p = pickPuzzle();
+    const p = pickSudoku9Puzzle();
     return { puzzle: p, cells: [...p.initial] as number[] };
   });
 
@@ -68,44 +66,44 @@ export function Sudoku4Game({ onWin }: GameProps) {
       return;
     }
     const ok =
-      respectsSudokuGivens(cells, puzzle.initial) &&
-      isValidCompletedSudoku4(cells);
+      respectsSudoku9Givens(cells, puzzle.initial) &&
+      isValidCompletedSudoku9(cells);
     if (ok) {
       setFeedback(null);
       onWin?.({
-        solutionText: formatSudoku4Lines(puzzle.solution),
+        solutionText: formatSudoku9Lines(puzzle.solution),
       });
     } else {
       setFeedback("bad");
     }
   }
 
-  const rows = chunk(cells, 4);
+  const rows = chunk(cells, SIZE);
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
       <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
-        Cada fila, columna y bloque debe tener 1, 2, 3 y 4 sin repetir.
+        Cada fila, columna y bloque 3×3 debe tener los dígitos 1–9 sin repetir.
       </p>
       <div
-        className="border-border bg-border mx-auto grid w-full max-w-xs grid-cols-4 gap-px overflow-hidden rounded-xl border-2 p-0.5 sm:p-1"
+        className="border-border bg-border mx-auto grid w-full max-w-md grid-cols-9 gap-px overflow-hidden rounded-xl border-2 p-0.5 sm:max-w-lg sm:p-1"
         role="grid"
-        aria-label="Sudoku 4 por 4"
+        aria-label="Sudoku 9 por 9"
       >
         {rows.map((row, ri) =>
           row.map((val, ci) => {
-            const i = ri * 4 + ci;
+            const i = ri * SIZE + ci;
             const fixed = puzzle.initial[i] !== 0;
-            const br = ci === 1;
-            const bb = ri === 1;
+            const br = ci % 3 === 2 && ci < SIZE - 1;
+            const bb = ri % 3 === 2 && ri < SIZE - 1;
             return (
               <div
                 key={i}
-                className={`bg-card ${br ? "border-r-border border-r-2" : ""} ${bb ? "border-b-border border-b-2" : ""} flex aspect-square items-center justify-center p-0.5`}
+                className={`bg-card ${br ? "border-r-border border-r-2" : ""} ${bb ? "border-b-border border-b-2" : ""} flex aspect-square min-w-0 items-center justify-center p-px sm:p-0.5`}
                 role="gridcell"
               >
                 {fixed ? (
-                  <span className="text-base font-semibold tabular-nums sm:text-lg">
+                  <span className="text-xs font-semibold tabular-nums sm:text-sm">
                     {puzzle.initial[i]}
                   </span>
                 ) : (
@@ -113,7 +111,7 @@ export function Sudoku4Game({ onWin }: GameProps) {
                     inputMode="numeric"
                     maxLength={2}
                     aria-label={`Celda fila ${ri + 1} columna ${ci + 1}`}
-                    className="h-full min-h-0 w-full rounded-none border-0 bg-transparent text-center text-[16px] shadow-none focus-visible:ring-2 sm:text-lg"
+                    className="h-full min-h-0 w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-center text-[13px] shadow-none focus-visible:ring-1 sm:text-sm"
                     value={val === 0 ? "" : String(val)}
                     onChange={(e) => setCell(i, e.target.value)}
                   />

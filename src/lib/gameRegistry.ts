@@ -8,11 +8,11 @@ import { MathQuickGame } from "@/games/MathQuickGame"
 import { MemoryPairsGame } from "@/games/MemoryPairsGame"
 import { OrderTapGame } from "@/games/OrderTapGame"
 import { SequenceGame } from "@/games/SequenceGame"
-import { Sudoku4Game } from "@/games/Sudoku4Game"
+import { Sudoku9Game } from "@/games/Sudoku9Game"
 import type { GameProps } from "@/games/types"
 
 export type GameId =
-  | "sudoku4"
+  | "sudoku9"
   | "math"
   | "sequence"
   | "count"
@@ -65,10 +65,10 @@ export const GAMES: GameDefinition[] = [
     component: GroundingGame,
   },
   {
-    id: "sudoku4",
-    title: "Sudoku 4×4",
-    description: "Rellena la cuadrícula (bloques 2×2).",
-    component: Sudoku4Game,
+    id: "sudoku9",
+    title: "Sudoku 9×9",
+    description: "Rellena la cuadrícula (bloques 3×3); puzles con muchas pistas.",
+    component: Sudoku9Game,
   },
   {
     id: "memory",
@@ -78,9 +78,9 @@ export const GAMES: GameDefinition[] = [
   },
   {
     id: "orderTap",
-    title: "16 números en orden",
+    title: "Ordena los números",
     description:
-      "Toca 16 números consecutivos (p. ej. del 21 al 36); un fallo reinicia desde el primero.",
+      "Toca 25 números consecutivos en orden (p. ej. del 21 al 45); un fallo reinicia desde el primero.",
     component: OrderTapGame,
   },
   {
