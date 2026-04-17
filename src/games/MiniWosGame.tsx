@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LetterKeypad } from "@/components/letter-keypad";
+import { FullLetterKeypad } from "@/components/letter-keypad";
 import { Input } from "@/components/ui/input";
 import type { GameProps } from "@/games/types";
 import miniWosData from "@/data/miniWosCombinations.json" with { type: "json" };
@@ -65,6 +65,10 @@ function sortWordsForGrid(words: readonly string[]) {
   });
 }
 
+function wordGraphemeLen(s: string) {
+  return [...s.normalize("NFC")].length;
+}
+
 const COL_COUNT = 2;
 
 /** Incluye siempre la palabra base como jugable si no figura ya (misma forma normalizada). */
@@ -118,11 +122,23 @@ export function MiniWosGame({ onWin }: GameProps) {
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputWiggleRef = useRef<HTMLDivElement>(null);
 
-  const uniqueKeyLetters = useMemo(() => {
-    const u = [...new Set(combo.letras)];
-    u.sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
-    return u;
-  }, [combo.letras]);
+  /** Letras que aparecen en alguna palabra con la longitud máxima de la ronda (empates incluidos). */
+  const allowedFromLongestWords = useMemo(() => {
+    let maxLen = 0;
+    for (const w of palabrasCompletas) {
+      const len = wordGraphemeLen(w);
+      if (len > maxLen) maxLen = len;
+    }
+    const set = new Set<string>();
+    for (const w of palabrasCompletas) {
+      if (wordGraphemeLen(w) !== maxLen) continue;
+      const upper = inputToUpperNoAccents(w);
+      for (const ch of [...upper.normalize("NFC")]) {
+        set.add(ch);
+      }
+    }
+    return set;
+  }, [palabrasCompletas]);
 
   function clearFlashTimer() {
     if (flashTimerRef.current !== null) {
@@ -239,13 +255,6 @@ export function MiniWosGame({ onWin }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
-      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
-        Encuentra <strong>todas</strong> las palabras de{" "}
-        <strong>al menos {MIN_LETTERS} letras</strong> que se pueden formar con
-        estas letras sin límite de tiempo. Las letras superiores se mezclan cada
-        10 segundos.
-      </p>
-
       <div
         className={cn(
           "border-border bg-muted/40 flex flex-wrap justify-center gap-1.5 rounded-xl border px-2 py-3 sm:gap-2 sm:px-3 sm:py-4",
@@ -346,12 +355,14 @@ export function MiniWosGame({ onWin }: GameProps) {
             <ArrowRight className="size-5" aria-hidden />
           </Button>
         </div>
-        <LetterKeypad
-          letters={uniqueKeyLetters}
-          isLetterDisabled={(ch) => !canAppendFromBag(value, ch, combo.letras)}
+        <FullLetterKeypad
+          isLetterDisabled={(ch) =>
+            !allowedFromLongestWords.has(ch) ||
+            !canAppendFromBag(value, ch, combo.letras)
+          }
           onLetter={appendLetter}
           onBackspace={backspaceLetter}
-          ariaLabel="Letras de la ronda"
+          ariaLabel="Teclado: solo activas las letras que salen en las palabras más largas de la ronda"
         />
       </div>
     </div>

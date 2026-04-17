@@ -1,15 +1,15 @@
-import type { ComponentType } from "react"
-import { MiniWosGame } from "@/games/MiniWosGame"
-import { CategoryNamesGame } from "@/games/CategoryNamesGame"
-import { CountShapesGame } from "@/games/CountShapesGame"
-import { CompareNumbersGame } from "@/games/CompareNumbersGame"
-import { GroundingGame } from "@/games/GroundingGame"
-import { MathQuickGame } from "@/games/MathQuickGame"
-import { MemoryPairsGame } from "@/games/MemoryPairsGame"
-import { OrderTapGame } from "@/games/OrderTapGame"
-import { SequenceGame } from "@/games/SequenceGame"
-import { Sudoku9Game } from "@/games/Sudoku9Game"
-import type { GameProps } from "@/games/types"
+import type { ComponentType } from "react";
+import { MiniWosGame } from "@/games/MiniWosGame";
+import { CategoryNamesGame } from "@/games/CategoryNamesGame";
+import { CountShapesGame } from "@/games/CountShapesGame";
+import { CompareNumbersGame } from "@/games/CompareNumbersGame";
+import { GroundingGame } from "@/games/GroundingGame";
+import { MathQuickGame } from "@/games/MathQuickGame";
+import { MemoryPairsGame } from "@/games/MemoryPairsGame";
+import { OrderTapGame } from "@/games/OrderTapGame";
+import { SequenceGame } from "@/games/SequenceGame";
+import { Sudoku9Game } from "@/games/Sudoku9Game";
+import type { GameProps } from "@/games/types";
 
 export type GameId =
   | "sudoku9"
@@ -21,100 +21,98 @@ export type GameId =
   | "memory"
   | "orderTap"
   | "categoryNames"
-  | "compareNumbers"
+  | "compareNumbers";
 
 export type GameDefinition = {
-  id: GameId
-  title: string
-  description: string
-  component: ComponentType<GameProps>
-}
+  id: GameId;
+  title: string;
+  description: string;
+  component: ComponentType<GameProps>;
+};
 
 export const GAMES: GameDefinition[] = [
   {
     id: "sequence",
     title: "Siguiente número",
     description:
-      "Series con distintas reglas: saltos fijos, alternos, cuadráticas…",
+      "Completa la serie: averigua qué número falta al final. El patrón puede ser un salto fijo, saltos que alternan, cuadrados, productos u otras reglas.",
     component: SequenceGame,
   },
   {
     id: "math",
     title: "Cuenta rápida",
-    description:
-      "Multiplicaciones y divisiones enteras (divisor 3, 4 o 5; dividendo ≥ 90). Filtro: todo, solo × o solo ÷.",
+    description: "Resuelve multiplicaciones y divisiones con resultado entero.",
     component: MathQuickGame,
   },
   {
     id: "count",
     title: "Contar emojis",
     description:
-      "Cuenta un emoji entre muchos otros (5–20 objetivos); repartidos para poder distinguirlos.",
+      "Verás muchos emojis repartidos por la pantalla, cuenta cuántas veces aparece el emoji seleccionado y ignora el resto.",
     component: CountShapesGame,
   },
   {
     id: "anagram",
     title: "Mini-wos",
     description:
-      "Forma todas las palabras posibles con las letras; rejilla por longitud y orden alfabético.",
+      "Con las letras de la ronda forma todas las palabras válidas de al menos cuatro letras. Las letras de arriba se barajan cada 10 segundos.",
     component: MiniWosGame,
   },
   {
     id: "grounding",
     title: "Grounding 5-4-3-2-1",
-    description: "Ancoraje guiado: volver al cuerpo y al entorno.",
+    description:
+      "Ejercicio de anclaje para volver al cuerpo y al entorno: recorre los pasos 5-4-3-2-1. En cada uno escribe lo que ves, oyes, notas al tacto, hueles o saboreas (o piénsalo en silencio).",
     component: GroundingGame,
   },
   {
     id: "sudoku9",
-    title: "Sudoku 9×9",
-    description: "Rellena la cuadrícula (bloques 3×3); puzles con muchas pistas.",
+    title: "Sudoku 9x9",
+    description:
+      "Rellena las celdas vacías para que cada fila, columna y bloque de 3x3 tenga los números del 1 al 9 sin repetir. Las celdas con número fijo no se pueden cambiar.",
     component: Sudoku9Game,
   },
   {
     id: "memory",
     title: "Parejas de emojis",
-    description: "16 cartas, 8 parejas. Memoriza y empareja.",
+    description:
+      "Encuentra todas las parejas, toca dos cartas para voltearlas; si coinciden se quedan descubiertas.",
     component: MemoryPairsGame,
   },
   {
     id: "orderTap",
     title: "Ordena los números",
     description:
-      "Toca 25 números consecutivos en orden (p. ej. del 21 al 45); un fallo reinicia desde el primero.",
+      "Pulsa los números en orden. Si pulsas un número que no toca, la ronda se reinicia desde el principio.",
     component: OrderTapGame,
   },
   {
     id: "categoryNames",
     title: "3 por categoría",
-    description:
-      "Frutas, colores, animales… Escribe tres cosas según el enunciado.",
+    description: "Nombra tres cosas que encajen con la categoría seleccionada.",
     component: CategoryNamesGame,
   },
   {
     id: "compareNumbers",
     title: "¿Cuál es mayor?",
-    description:
-      "Tres operaciones A, B y C: dos resultados parecidos y uno claramente menor; elige la mayor.",
+    description: "Elige la opción cuyo resultado sea el mayor.",
     component: CompareNumbersGame,
   },
-]
+];
 
 function randomInt(max: number) {
-  return Math.floor(Math.random() * max)
+  return Math.floor(Math.random() * max);
 }
 
 export function pickRandomGame(excludeId?: GameId): GameDefinition {
   const pool =
-    excludeId === undefined
-      ? GAMES
-      : GAMES.filter((g) => g.id !== excludeId)
+    excludeId === undefined ? GAMES : GAMES.filter((g) => g.id !== excludeId);
   if (pool.length === 0) {
-    return GAMES[randomInt(GAMES.length)]!
+    return GAMES[randomInt(GAMES.length)]!;
   }
-  return pool[randomInt(pool.length)]!
+  return pool[randomInt(pool.length)]!;
 }
 
 export function getGameById(id: GameId): GameDefinition {
-  return GAMES.find((g) => g.id === id) ?? GAMES[0]!
+  return GAMES.find((g) => g.id === id) ?? GAMES[0]!;
 }

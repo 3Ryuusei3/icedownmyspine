@@ -78,10 +78,9 @@ export function OrderTapGame({ onWin }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
-      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
-        Pulsa los números del <strong>{round.start}</strong> al{" "}
-        <strong>{round.end}</strong> en orden. Si te equivocas, vuelves a
-        empezar.
+      <p className="text-center text-base font-medium tabular-nums sm:text-lg">
+        En esta partida: del <span className="text-foreground">{round.start}</span>{" "}
+        al <span className="text-foreground">{round.end}</span>
       </p>
       {wrongFlash ? (
         <p

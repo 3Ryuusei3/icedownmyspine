@@ -269,12 +269,6 @@ export function CompareNumbersGame({ onWin }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-muted-foreground text-sm leading-relaxed">
-        ¿Cuál cantidad es <strong className="text-foreground">mayor</strong>?
-        Siempre hay que <strong className="text-foreground">calcular</strong>{" "}
-        cada opción. Dos dan un resultado parecido; la tercera es claramente
-        menor. Toca A, B o C.
-      </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Button
           type="button"

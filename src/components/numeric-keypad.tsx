@@ -7,6 +7,8 @@ export type NumericKeypadProps = {
   onBackspace: () => void
   /** Dígitos disponibles en orden de izquierda a derecha. */
   digits?: readonly string[]
+  /** Si es true, todas las teclas están deshabilitadas (p. ej. sudoku sin celda). */
+  disabled?: boolean
   className?: string
   /** Etiqueta accesible del grupo. */
   ariaLabel?: string
@@ -37,6 +39,7 @@ export function NumericKeypad({
   onDigit,
   onBackspace,
   digits = DEFAULT_DIGITS,
+  disabled = false,
   className,
   ariaLabel = "Teclado numérico",
 }: NumericKeypadProps) {
@@ -44,6 +47,7 @@ export function NumericKeypad({
     <div
       role="group"
       aria-label={ariaLabel}
+      aria-disabled={disabled}
       className={cn(
         "flex w-full flex-row gap-1 sm:gap-1.5",
         className,
@@ -56,6 +60,7 @@ export function NumericKeypad({
           key={d}
           type="button"
           variant="outline"
+          disabled={disabled}
           className="min-h-10 flex-1 px-0 text-base font-semibold tabular-nums sm:min-h-11 sm:text-lg"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => onDigit(d)}
@@ -67,6 +72,7 @@ export function NumericKeypad({
       <Button
         type="button"
         variant="outline"
+        disabled={disabled}
         className="min-h-10 flex-1 px-0 sm:min-h-11"
         onMouseDown={(e) => e.preventDefault()}
         onClick={onBackspace}

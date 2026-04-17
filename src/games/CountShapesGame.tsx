@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -127,8 +127,6 @@ export function CountShapesGame({ onWin }: GameProps) {
 
   const [value, setValue] = useState("")
   const [feedback, setFeedback] = useState<"bad" | null>(null)
-  const [padOpen, setPadOpen] = useState(false)
-  const answerBlockRef = useRef<HTMLDivElement>(null)
 
   function appendDigit(d: string) {
     setFeedback(null)
@@ -157,8 +155,8 @@ export function CountShapesGame({ onWin }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
-      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
-        {round.target.question} Cuenta solo ese emoji e ignora el resto.
+      <p className="text-center text-base font-medium text-pretty sm:text-lg">
+        {round.target.question}
       </p>
       <div
         className="border-border bg-muted/30 relative mx-auto aspect-[3/2] w-full max-w-md overflow-hidden rounded-xl border sm:aspect-[4/3]"
@@ -176,50 +174,32 @@ export function CountShapesGame({ onWin }: GameProps) {
           </span>
         ))}
       </div>
-      <div ref={answerBlockRef} className="flex flex-col gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="count-answer">Cantidad</Label>
-          <Input
-            id="count-answer"
-            inputMode="none"
-            autoComplete="off"
-            placeholder="Número"
-            value={value}
-            onFocus={() => setPadOpen(true)}
-            onBlur={(e) => {
-              const next = e.relatedTarget as Node | null
-              if (next && answerBlockRef.current?.contains(next)) return
-              if (next !== null) {
-                setPadOpen(false)
-                return
-              }
-              window.setTimeout(() => {
-                const el = document.activeElement as Node | null
-                if (el && answerBlockRef.current?.contains(el)) return
-                setPadOpen(false)
-              }, 0)
-            }}
-            onChange={(e) => {
-              setValue(e.target.value.replace(/\D/g, ""))
-              setFeedback(null)
-            }}
-            className="min-h-10 sm:min-h-11"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                e.stopPropagation()
-                check()
-              }
-            }}
-          />
-          {padOpen && (
-            <NumericKeypad onDigit={appendDigit} onBackspace={backspace} />
-          )}
-        </div>
-        <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
-          Comprobar
-        </Button>
+      <div className="space-y-2">
+        <Label htmlFor="count-answer">Cantidad</Label>
+        <Input
+          id="count-answer"
+          inputMode="none"
+          autoComplete="off"
+          placeholder="Número"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value.replace(/\D/g, ""))
+            setFeedback(null)
+          }}
+          className="min-h-10 sm:min-h-11"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              e.stopPropagation()
+              check()
+            }
+          }}
+        />
+        <NumericKeypad onDigit={appendDigit} onBackspace={backspace} />
       </div>
+      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
+        Comprobar
+      </Button>
       {feedback === "bad" && (
         <p className="text-center text-sm text-destructive">
           Cuenta otra vez con tranquilidad.

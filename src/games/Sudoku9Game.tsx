@@ -88,9 +88,6 @@ export function Sudoku9Game({ onWin }: GameProps) {
         }
       }}
     >
-      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
-        Cada fila, columna y bloque 3×3 debe tener los dígitos 1–9 sin repetir.
-      </p>
       <div
         ref={gridRef}
         className="border-border bg-border mx-auto grid w-full max-w-md grid-cols-9 gap-px overflow-hidden rounded-xl border-2 p-0.5 sm:max-w-lg sm:p-1"
@@ -134,13 +131,17 @@ export function Sudoku9Game({ onWin }: GameProps) {
           }),
         )}
       </div>
-      {activeCell !== null && (
-        <NumericKeypad
-          digits={SUDOKU_DIGITS}
-          onDigit={onKeypadDigit}
-          onBackspace={onKeypadBackspace}
-        />
-      )}
+      <NumericKeypad
+        digits={SUDOKU_DIGITS}
+        disabled={activeCell === null}
+        onDigit={onKeypadDigit}
+        onBackspace={onKeypadBackspace}
+        ariaLabel={
+          activeCell === null
+            ? "Teclado numérico: elige una celda vacía para escribir"
+            : "Teclado numérico"
+        }
+      />
       <Button
         type="button"
         className="min-h-10 w-full sm:min-h-11"

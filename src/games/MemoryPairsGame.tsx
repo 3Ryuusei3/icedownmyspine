@@ -102,10 +102,6 @@ export function MemoryPairsGame({ onWin }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
-      <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
-        Hay 8 parejas de emojis. Toca dos cartas para voltearlas; si coinciden
-        se quedan descubiertas.
-      </p>
       <div
         className="mx-auto grid w-full max-w-sm grid-cols-4 gap-1.5 sm:max-w-md sm:gap-3"
         role="grid"

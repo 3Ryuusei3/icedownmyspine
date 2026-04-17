@@ -82,11 +82,8 @@ export function CategoryNamesGame({ onWin }: GameProps) {
   return (
     <div className="flex w-full flex-col gap-4 max-sm:gap-2">
       <div>
-        <p className="text-foreground max-sm:text-sm font-medium">
+        <p className="text-foreground max-sm:text-sm text-base font-medium leading-snug sm:text-lg">
           {prompt.instruction}
-        </p>
-        <p className="text-muted-foreground mt-1 max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
-          No hay respuestas incorrectas: lo importante es nombrar tres cosas.
         </p>
       </div>
 
