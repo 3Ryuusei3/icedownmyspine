@@ -74,7 +74,6 @@ export function OrderTapGame({ onWin }: GameProps) {
       }, 450);
     }
   }
-
   const gridLabel = `Cuadrícula del ${round.start} al ${round.end}`;
 
   return (

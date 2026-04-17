@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LetterKeypad } from "@/components/letter-keypad";
 import { Input } from "@/components/ui/input";
 import type { GameProps } from "@/games/types";
 import miniWosData from "@/data/miniWosCombinations.json" with { type: "json" };
@@ -38,6 +39,21 @@ function canSpellWithBag(word: string, letters: readonly string[]) {
   const need = letterBagCounts([...word]);
   for (const [ch, n] of need) {
     if ((bag.get(ch) ?? 0) < n) return false;
+  }
+  return true;
+}
+
+/** No superar la bolsa de la ronda al añadir un carácter. */
+function canAppendFromBag(
+  current: string,
+  ch: string,
+  letters: readonly string[],
+) {
+  const maxBag = letterBagCounts(letters);
+  const next = inputToUpperNoAccents(current + ch);
+  const used = letterBagCounts([...next.normalize("NFC")]);
+  for (const [c, n] of used) {
+    if ((maxBag.get(c) ?? 0) < n) return false;
   }
   return true;
 }
@@ -101,6 +117,12 @@ export function MiniWosGame({ onWin }: GameProps) {
   const [inputFlash, setInputFlash] = useState<InputFlash>("idle");
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputWiggleRef = useRef<HTMLDivElement>(null);
+
+  const uniqueKeyLetters = useMemo(() => {
+    const u = [...new Set(combo.letras)];
+    u.sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
+    return u;
+  }, [combo.letras]);
 
   function clearFlashTimer() {
     if (flashTimerRef.current !== null) {
@@ -202,6 +224,19 @@ export function MiniWosGame({ onWin }: GameProps) {
     }, INPUT_FLASH_MS);
   }
 
+  function appendLetter(ch: string) {
+    if (!canAppendFromBag(value, ch, combo.letras)) return;
+    setValue(inputToUpperNoAccents(value + ch));
+    clearFlashTimer();
+    setInputFlash("idle");
+  }
+
+  function backspaceLetter() {
+    setValue((v) => v.slice(0, -1));
+    clearFlashTimer();
+    setInputFlash("idle");
+  }
+
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
       <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
@@ -268,46 +303,56 @@ export function MiniWosGame({ onWin }: GameProps) {
         {found.size} / {palabrasCompletas.length} palabras
       </p>
 
-      <div className="flex w-full max-w-2xl flex-row items-center gap-2 self-center">
-        <div ref={inputWiggleRef} className="min-w-0 flex-1">
-          <Input
-            id="mini-wos-input"
-            autoComplete="off"
-            autoCapitalize="characters"
-            placeholder="Palabra…"
-            value={value}
-            onChange={(e) => {
-              setValue(inputToUpperNoAccents(e.target.value));
-              clearFlashTimer();
-              setInputFlash("idle");
-            }}
-            aria-invalid={inputFlash === "error"}
-            className={cn(
-              "min-h-10 w-full transition-[color,box-shadow,background-color,border-color] duration-200 sm:min-h-11",
-              inputFlash === "error" &&
-                "border-destructive bg-destructive/10 text-destructive ring-2 ring-destructive/35 dark:bg-destructive/20 dark:ring-destructive/45",
-              inputFlash === "success" &&
-                "border-emerald-600 bg-emerald-600/15 text-emerald-950 ring-2 ring-emerald-600/35 dark:border-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-50 dark:ring-emerald-500/40",
-            )}
-            aria-label="Escribe una palabra"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                e.stopPropagation();
-                submit();
-              }
-            }}
-          />
+      <div className="flex w-full max-w-2xl flex-col gap-2 self-center">
+        <div className="flex flex-row items-center gap-2">
+          <div ref={inputWiggleRef} className="min-w-0 flex-1">
+            <Input
+              id="mini-wos-input"
+              inputMode="none"
+              autoComplete="off"
+              autoCapitalize="characters"
+              placeholder="Palabra…"
+              value={value}
+              onChange={(e) => {
+                setValue(inputToUpperNoAccents(e.target.value));
+                clearFlashTimer();
+                setInputFlash("idle");
+              }}
+              aria-invalid={inputFlash === "error"}
+              className={cn(
+                "min-h-10 w-full transition-[color,box-shadow,background-color,border-color] duration-200 sm:min-h-11",
+                inputFlash === "error" &&
+                  "border-destructive bg-destructive/10 text-destructive ring-2 ring-destructive/35 dark:bg-destructive/20 dark:ring-destructive/45",
+                inputFlash === "success" &&
+                  "border-emerald-600 bg-emerald-600/15 text-emerald-950 ring-2 ring-emerald-600/35 dark:border-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-50 dark:ring-emerald-500/40",
+              )}
+              aria-label="Escribe una palabra"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  submit();
+                }
+              }}
+            />
+          </div>
+          <Button
+            type="button"
+            size="icon"
+            className="size-10 shrink-0 sm:size-11"
+            onClick={submit}
+            aria-label="Enviar palabra (o pulsa Enter)"
+          >
+            <ArrowRight className="size-5" aria-hidden />
+          </Button>
         </div>
-        <Button
-          type="button"
-          size="icon"
-          className="size-10 shrink-0 sm:size-11"
-          onClick={submit}
-          aria-label="Enviar palabra (o pulsa Enter)"
-        >
-          <ArrowRight className="size-5" aria-hidden />
-        </Button>
+        <LetterKeypad
+          letters={uniqueKeyLetters}
+          isLetterDisabled={(ch) => !canAppendFromBag(value, ch, combo.letras)}
+          onLetter={appendLetter}
+          onBackspace={backspaceLetter}
+          ariaLabel="Letras de la ronda"
+        />
       </div>
     </div>
   );
