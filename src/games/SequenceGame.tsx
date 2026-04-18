@@ -7,6 +7,16 @@ import type { GameProps } from "@/games/types"
 import { useStableRandom } from "@/hooks/use-stable-random"
 import { buildRandomSequencePuzzle } from "@/lib/sequencePuzzle"
 
+const MAX_DIGITS = 9
+
+function sanitizeSignedIntegerInput(raw: string): string {
+  const only = raw.replace(/[^\d-]/g, "")
+  const leadingMinus = only.startsWith("-")
+  const digits = only.replace(/-/g, "").slice(0, MAX_DIGITS)
+  if (digits === "") return leadingMinus ? "-" : ""
+  return leadingMinus ? `-${digits}` : digits
+}
+
 export function SequenceGame({ onWin }: GameProps) {
   const puzzle = useStableRandom(() => buildRandomSequencePuzzle())
 
@@ -32,12 +42,25 @@ export function SequenceGame({ onWin }: GameProps) {
 
   function appendDigit(d: string) {
     setFeedback(null)
-    setValue((v) => (v.length >= 9 ? v : v + d))
+    setValue((v) => {
+      const neg = v.startsWith("-")
+      const core = neg ? v.slice(1) : v
+      if (core.length >= MAX_DIGITS) return v
+      return neg ? `-${core}${d}` : `${v}${d}`
+    })
   }
 
   function backspace() {
     setFeedback(null)
     setValue((v) => v.slice(0, -1))
+  }
+
+  function toggleLeadingMinus() {
+    setFeedback(null)
+    setValue((v) => {
+      if (v.startsWith("-")) return v.slice(1)
+      return v === "" ? "-" : `-${v}`
+    })
   }
 
   return (
@@ -54,7 +77,7 @@ export function SequenceGame({ onWin }: GameProps) {
           placeholder="Número"
           value={value}
           onChange={(e) => {
-            setValue(e.target.value.replace(/\D/g, ""))
+            setValue(sanitizeSignedIntegerInput(e.target.value))
             setFeedback(null)
           }}
           className="min-h-10 sm:min-h-11"
@@ -66,7 +89,11 @@ export function SequenceGame({ onWin }: GameProps) {
             }
           }}
         />
-        <NumericKeypad onDigit={appendDigit} onBackspace={backspace} />
+        <NumericKeypad
+          onDigit={appendDigit}
+          onBackspace={backspace}
+          onToggleSign={toggleLeadingMinus}
+        />
       </div>
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         Comprobar

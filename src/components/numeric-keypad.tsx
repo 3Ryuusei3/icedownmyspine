@@ -1,18 +1,16 @@
-import { Delete } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { Delete } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export type NumericKeypadProps = {
-  onDigit: (digit: string) => void
-  onBackspace: () => void
-  /** Dígitos disponibles en orden de izquierda a derecha. */
-  digits?: readonly string[]
-  /** Si es true, todas las teclas están deshabilitadas (p. ej. sudoku sin celda). */
-  disabled?: boolean
-  className?: string
-  /** Etiqueta accesible del grupo. */
-  ariaLabel?: string
-}
+  onDigit: (digit: string) => void;
+  onBackspace: () => void;
+  digits?: readonly string[];
+  disabled?: boolean;
+  className?: string;
+  ariaLabel?: string;
+  onToggleSign?: () => void;
+};
 
 const DEFAULT_DIGITS = [
   "1",
@@ -25,16 +23,8 @@ const DEFAULT_DIGITS = [
   "8",
   "9",
   "0",
-] as const
+] as const;
 
-/**
- * Teclado numérico de una sola fila para usar bajo un input que tenga
- * `inputMode="none"`, evitando así el teclado del sistema en móvil.
- *
- * Los botones usan `onMouseDown` con `preventDefault` para no robar el foco
- * al input asociado (el caret sigue visible y el botón de enviar del input
- * Enter del teclado físico sigue funcionando).
- */
 export function NumericKeypad({
   onDigit,
   onBackspace,
@@ -42,19 +32,30 @@ export function NumericKeypad({
   disabled = false,
   className,
   ariaLabel = "Teclado numérico",
+  onToggleSign,
 }: NumericKeypadProps) {
   return (
     <div
       role="group"
       aria-label={ariaLabel}
       aria-disabled={disabled}
-      className={cn(
-        "flex w-full flex-row gap-1 sm:gap-1.5",
-        className,
-      )}
+      className={cn("flex w-full flex-row gap-1 sm:gap-1.5", className)}
       onPointerDown={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
     >
+      {onToggleSign ? (
+        <Button
+          type="button"
+          variant="outline"
+          disabled={disabled}
+          className="min-h-10 min-w-0 flex-1 px-0 text-base font-semibold tabular-nums sm:min-h-11 sm:text-lg"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => onToggleSign()}
+          aria-label="Signo menos al inicio del número"
+        >
+          -
+        </Button>
+      ) : null}
       {digits.map((d) => (
         <Button
           key={d}
@@ -81,5 +82,5 @@ export function NumericKeypad({
         <Delete className="size-4" aria-hidden />
       </Button>
     </div>
-  )
+  );
 }
