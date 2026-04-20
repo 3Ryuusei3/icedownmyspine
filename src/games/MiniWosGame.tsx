@@ -69,6 +69,36 @@ function wordGraphemeLen(s: string) {
   return [...s.normalize("NFC")].length;
 }
 
+function addRandomLetterHint(
+  prev: ReadonlyMap<string, Set<number>>,
+  words: readonly string[],
+  foundSet: ReadonlySet<string>,
+): {
+  next: Map<string, Set<number>>;
+  pick: { word: string; idx: number } | null;
+} {
+  const unfound = words.filter((w) => !foundSet.has(w));
+  if (unfound.length === 0)
+    return { next: prev as Map<string, Set<number>>, pick: null };
+
+  const candidates: { word: string; idx: number }[] = [];
+  for (const w of unfound) {
+    const hinted = prev.get(w) ?? new Set<number>();
+    for (let i = 0; i < w.length; i++) {
+      if (!hinted.has(i)) candidates.push({ word: w, idx: i });
+    }
+  }
+  if (candidates.length === 0)
+    return { next: prev as Map<string, Set<number>>, pick: null };
+
+  const pick = candidates[Math.floor(Math.random() * candidates.length)]!;
+  const next = new Map(prev);
+  const set = new Set(next.get(pick.word) ?? []);
+  set.add(pick.idx);
+  next.set(pick.word, set);
+  return { next, pick };
+}
+
 const COL_COUNT = 2;
 
 /** Incluye siempre la palabra base como jugable si no figura ya (misma forma normalizada). */
@@ -90,6 +120,9 @@ function mergePalabras(
 const SHUFFLE_MS = 10_000;
 const INPUT_FLASH_MS = 1_000;
 const MIN_LETTERS = 4;
+/** Sin acertar palabra: primera pista; después, una pista cada este intervalo. */
+const FIRST_WORD_HINT_MS = 15_000;
+const WORD_HINT_INTERVAL_MS = 20_000;
 
 type InputFlash = "idle" | "error" | "success";
 
@@ -117,12 +150,25 @@ export function MiniWosGame({ onWin }: GameProps) {
   const [shuffleNonce, setShuffleNonce] = useState(0);
   const [shuffleAnim, setShuffleAnim] = useState(false);
   const [found, setFound] = useState<Set<string>>(() => new Set());
+  const [hintsByWord, setHintsByWord] = useState(
+    () => new Map<string, Set<number>>(),
+  );
+  const [hintFlipCell, setHintFlipCell] = useState<{
+    word: string;
+    i: number;
+  } | null>(null);
   const [value, setValue] = useState("");
   const [inputFlash, setInputFlash] = useState<InputFlash>("idle");
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hintFlipClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const foundRef = useRef(found);
+  foundRef.current = found;
+  const palabrasRef = useRef(palabrasCompletas);
+  palabrasRef.current = palabrasCompletas;
+  const hintsRef = useRef(hintsByWord);
+  hintsRef.current = hintsByWord;
   const inputWiggleRef = useRef<HTMLDivElement>(null);
 
-  /** Letras que aparecen en alguna palabra con la longitud máxima de la ronda (empates incluidos). */
   const allowedFromLongestWords = useMemo(() => {
     let maxLen = 0;
     for (const w of palabrasCompletas) {
@@ -144,6 +190,13 @@ export function MiniWosGame({ onWin }: GameProps) {
     if (flashTimerRef.current !== null) {
       window.clearTimeout(flashTimerRef.current);
       flashTimerRef.current = null;
+    }
+  }
+
+  function clearHintFlipTimer() {
+    if (hintFlipClearRef.current !== null) {
+      window.clearTimeout(hintFlipClearRef.current);
+      hintFlipClearRef.current = null;
     }
   }
 
@@ -176,6 +229,41 @@ export function MiniWosGame({ onWin }: GameProps) {
   useEffect(() => {
     return () => clearFlashTimer();
   }, []);
+
+  useEffect(() => {
+    if (found.size >= palabrasCompletas.length) return;
+
+    const giveHint = () => {
+      const { next, pick } = addRandomLetterHint(
+        hintsRef.current,
+        palabrasRef.current,
+        foundRef.current,
+      );
+      if (pick === null && next === hintsRef.current) return;
+      hintsRef.current = next;
+      setHintsByWord(next);
+      if (pick) {
+        clearHintFlipTimer();
+        setHintFlipCell({ word: pick.word, i: pick.idx });
+        hintFlipClearRef.current = window.setTimeout(() => {
+          setHintFlipCell(null);
+          hintFlipClearRef.current = null;
+        }, 600);
+      }
+    };
+
+    let repeatId: ReturnType<typeof setInterval> | null = null;
+    const firstId = window.setTimeout(() => {
+      giveHint();
+      repeatId = window.setInterval(giveHint, WORD_HINT_INTERVAL_MS);
+    }, FIRST_WORD_HINT_MS);
+
+    return () => {
+      window.clearTimeout(firstId);
+      if (repeatId !== null) window.clearInterval(repeatId);
+      clearHintFlipTimer();
+    };
+  }, [found.size, palabrasCompletas.length]);
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -284,25 +372,36 @@ export function MiniWosGame({ onWin }: GameProps) {
       >
         {sortedWords.map((word) => {
           const done = found.has(word);
+          const hintedIndices = hintsByWord.get(word);
           return (
             <div
               key={word}
               role="listitem"
-              className="flex min-w-0 flex-row items-center justify-start gap-0.5"
+              className="flex min-w-0 flex-row items-center justify-start gap-0.5 perspective-[720px]"
             >
-              {Array.from({ length: word.length }, (_, i) => (
-                <span
-                  key={i}
-                  className={cn(
-                    "border-border flex h-8 w-7 shrink-0 items-center justify-center rounded border text-xs font-semibold uppercase sm:h-9 sm:w-8 sm:text-sm",
-                    done
-                      ? "border-emerald-600/40 bg-emerald-600/10 text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/15 dark:text-emerald-50"
-                      : "bg-muted/60 text-muted-foreground",
-                  )}
-                >
-                  {done ? word[i] : ""}
-                </span>
-              ))}
+              {Array.from({ length: word.length }, (_, i) => {
+                const hinted = !done && (hintedIndices?.has(i) ?? false);
+                const showLetter = done || hinted;
+                const playFlip =
+                  hinted && hintFlipCell?.word === word && hintFlipCell.i === i;
+                return (
+                  <span
+                    key={i}
+                    className={cn(
+                      "border-border flex h-8 w-7 shrink-0 items-center justify-center rounded border text-xs font-semibold uppercase sm:h-9 sm:w-8 sm:text-sm",
+                      done &&
+                        "border-emerald-600/40 bg-emerald-600/10 text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/15 dark:text-emerald-50",
+                      hinted &&
+                        !done &&
+                        "border-amber-600/45 bg-amber-500/15 text-amber-950 dark:border-amber-500/50 dark:bg-amber-500/20 dark:text-amber-50",
+                      !showLetter && "bg-muted/60 text-muted-foreground",
+                      playFlip && "animate-mini-wos-hint-flip",
+                    )}
+                  >
+                    {showLetter ? word[i] : ""}
+                  </span>
+                );
+              })}
             </div>
           );
         })}
