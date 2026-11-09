@@ -39,6 +39,8 @@ export type GameText = { title: string; description: string };
 export type GameDefinition = {
   id: GameId;
   category: GameCategory;
+  /** Si el tiempo de partida es significativo (se guarda el mejor tiempo). */
+  timed?: boolean;
   /** Idiomas en los que está disponible; todos si se omite. */
   langs?: Lang[];
   text: Record<Lang, GameText>;
@@ -169,6 +171,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "sudoku9",
     category: "game",
+    timed: true,
     text: {
       es: {
         title: "Sudoku 9x9",
@@ -186,6 +189,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "memory",
     category: "game",
+    timed: true,
     text: {
       es: {
         title: "Parejas de emojis",
@@ -203,6 +207,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "orderTap",
     category: "game",
+    timed: true,
     text: {
       es: {
         title: "Ordena los números",

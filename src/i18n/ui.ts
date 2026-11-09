@@ -21,10 +21,8 @@ const es = {
     aria: "Elegir minijuego",
     title: "Minijuegos",
     description: "Elige uno; se cargará una partida nueva.",
-    current: "Actual",
   },
 
-  palettePicker: { aria: "Elegir paleta de colores" },
   palettes: {
     noche: "Medianoche",
     hielo: "Hielo",
@@ -39,15 +37,31 @@ const es = {
   settings: {
     aria: "Configuración",
     title: "Configuración",
-    description: "Elige el idioma y qué juegos salen al pulsar «Jugar a otro».",
+    description: "Personaliza la app.",
+    tabs: { general: "General", rotation: "Rotación", data: "Datos" },
+    colors: "Colores",
     language: "Idioma",
-    rotation: "Rotación",
     all: "Todos",
     games: "Juegos",
     relax: "Relajación",
     inRotation: (n: number) => `${n} en la rotación`,
     custom: (n: number) => `Personalizada: ${n} en la rotación`,
     spanishOnly: "Algunos juegos solo están disponibles en español.",
+  },
+
+  data: {
+    intro:
+      "Solo se guardan en este dispositivo y no se pueden exportar. Donde ves un tiempo, es tu mejor marca.",
+    totalLabel: "Total",
+    times: (n: number) => (n === 1 ? "1 vez" : `${n} veces`),
+    never: "Sin jugar aún",
+    best: "Mejor tiempo",
+    reset: "Borrar estadísticas",
+    confirm: "¿Seguro? No se puede deshacer.",
+    confirmYes: "Sí, borrar",
+    cancel: "Cancelar",
+    lostNote:
+      "Si borras los datos del navegador o desinstalas la app, se perderán.",
   },
 
   playback: {
@@ -87,10 +101,8 @@ const en: UiText = {
     aria: "Choose a mini-game",
     title: "Mini-games",
     description: "Pick one; a new round will start.",
-    current: "Current",
   },
 
-  palettePicker: { aria: "Choose a color palette" },
   palettes: {
     noche: "Midnight",
     hielo: "Ice",
@@ -105,15 +117,31 @@ const en: UiText = {
   settings: {
     aria: "Settings",
     title: "Settings",
-    description: "Choose the language and which games come up on “Play another”.",
+    description: "Customize the app.",
+    tabs: { general: "General", rotation: "Rotation", data: "Data" },
+    colors: "Colors",
     language: "Language",
-    rotation: "Rotation",
     all: "All",
     games: "Games",
     relax: "Relaxation",
     inRotation: (n) => `${n} in rotation`,
     custom: (n) => `Custom: ${n} in rotation`,
     spanishOnly: "Some games are only available in Spanish.",
+  },
+
+  data: {
+    intro:
+      "Saved only on this device and can't be exported. Where you see a time, it's your best.",
+    totalLabel: "Total",
+    times: (n) => (n === 1 ? "1 time" : `${n} times`),
+    never: "Not played yet",
+    best: "Best time",
+    reset: "Clear stats",
+    confirm: "Sure? This can't be undone.",
+    confirmYes: "Yes, clear",
+    cancel: "Cancel",
+    lostNote:
+      "If you clear your browser data or uninstall the app, they'll be lost.",
   },
 
   playback: {

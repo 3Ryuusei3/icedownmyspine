@@ -87,11 +87,8 @@ const COPY = {
   },
 }
 
-/** Props del registro; no usamos `onWin` para no tapar la pantalla final. */
-export function GroundingGame(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- interfaz común con el resto de juegos
-  _props: GameProps,
-) {
+/** No usamos `onWin` para no tapar la pantalla final; solo avisamos con `onComplete`. */
+export function GroundingGame({ onComplete }: GameProps) {
   const { lang } = useLang()
   const c = COPY[lang]
   const [stepIndex, setStepIndex] = useState(0)
@@ -111,6 +108,7 @@ export function GroundingGame(
       setStepIndex((s) => s + 1)
     } else {
       setDone(true)
+      onComplete?.()
     }
   }
 

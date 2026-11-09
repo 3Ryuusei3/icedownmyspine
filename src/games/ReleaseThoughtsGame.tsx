@@ -1,6 +1,7 @@
 import { useState, type AnimationEvent, type CSSProperties } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import type { GameProps } from "@/games/types"
 import { useLang } from "@/lib/language"
 
 const MAX_LENGTH = 100
@@ -31,7 +32,7 @@ const POP_RAYS = Array.from({ length: 10 }, (_, i) => ({
   "--a": `${i * 36 + 18}deg`,
 }) as CSSProperties)
 
-export function ReleaseThoughtsGame() {
+export function ReleaseThoughtsGame({ onComplete }: GameProps) {
   const { lang } = useLang()
   const c = COPY[lang]
   const [text, setText] = useState("")
@@ -49,6 +50,7 @@ export function ReleaseThoughtsGame() {
     setFloating({ id: released, text: text.trim() })
     setPopping(false)
     setReleased((n) => n + 1)
+    onComplete?.()
     setText("")
   }
 

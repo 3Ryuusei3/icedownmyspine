@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GamePicker } from "@/components/game-picker";
-import { PalettePicker } from "@/components/palette-picker";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +20,7 @@ import type { WinPayload } from "@/games/types";
 import { useRotation } from "@/hooks/use-rotation";
 import { useUi } from "@/i18n/use-ui";
 import { useLang, type Lang } from "@/lib/language";
+import { recordPlay } from "@/lib/stats";
 import {
   getGameById,
   isAvailable,
@@ -71,7 +71,22 @@ export function Home() {
     setSession((s) => s + 1);
   }, []);
 
+  const startedAt = useRef(Date.now());
+  const gameKey = `${gameId}-${session}-${replayNonce}-${lang}`;
+  useEffect(() => {
+    startedAt.current = Date.now();
+  }, [gameKey]);
+
+  // Partida completada sin modal (juegos de relajación).
+  const handleComplete = useCallback(() => {
+    recordPlay(gameId);
+  }, [gameId]);
+
   const handleWin = useCallback((payload?: WinPayload) => {
+    recordPlay(
+      gameId,
+      game.timed ? Date.now() - startedAt.current : undefined,
+    );
     const text = payload?.solutionText;
     const solution =
       text === undefined || text === null || text === "" ? null : text;
@@ -79,7 +94,7 @@ export function Home() {
       setWinSolution(solution);
       setWinOpen(true);
     });
-  }, []);
+  }, [gameId, game.timed]);
 
   const replayCurrentGame = useCallback(() => {
     setReplayNonce((n) => n + 1);
@@ -120,13 +135,12 @@ export function Home() {
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
             <SettingsDialog
               enabled={enabled}
               onChange={setEnabled}
               onLanguageChange={changeLanguage}
             />
-            <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
-            <PalettePicker />
           </div>
         </header>
 
@@ -147,8 +161,9 @@ export function Home() {
                 <div className="flex flex-col items-center px-1 py-1 sm:px-2 sm:py-2">
                   <div className="w-full max-w-full">
                     <GameComponent
-                      key={`${gameId}-${session}-${replayNonce}-${lang}`}
+                      key={gameKey}
                       onWin={handleWin}
+                      onComplete={handleComplete}
                       onSwapGame={swapGame}
                     />
                   </div>

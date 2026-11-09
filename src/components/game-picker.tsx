@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import {
   Dialog,
   DialogContent,
@@ -63,19 +64,20 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
                 <Button
                   key={g.id}
                   type="button"
-                  variant={g.id === currentId ? "secondary" : "outline"}
-                  className="min-h-14 h-auto flex-col gap-0.5 whitespace-normal px-2 py-2 text-center text-xs leading-tight font-medium sm:min-h-16 sm:gap-1 sm:py-3 sm:text-sm"
+                  variant="outline"
+                  aria-current={g.id === currentId ? "true" : undefined}
+                  className={cn(
+                    "min-h-14 h-auto flex-col gap-0.5 whitespace-normal border-2 px-2 py-2 text-center text-xs leading-tight font-medium sm:min-h-16 sm:gap-1 sm:py-3 sm:text-sm",
+                    g.id === currentId &&
+                      // El botón «outline» pisa estos colores en las paletas oscuras (dark:), así que se repiten con dark:.
+                      "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground dark:border-primary dark:bg-primary dark:hover:bg-primary/90",
+                  )}
                   onClick={() => {
                     onSelect(g.id)
                     setOpen(false)
                   }}
                 >
                   <span>{g.text[lang].title}</span>
-                  {g.id === currentId ? (
-                    <span className="text-muted-foreground text-xs font-normal">
-                      {ui.picker.current}
-                    </span>
-                  ) : null}
                 </Button>
               ))}
             </div>

@@ -1,6 +1,7 @@
 import { Minus, Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import type { GameProps } from "@/games/types"
 import { useLang } from "@/lib/language"
 import {
   PlaybackControls,
@@ -99,7 +100,7 @@ function stateAt(sec: number, c: Config) {
   }
 }
 
-export function BreathingGame() {
+export function BreathingGame({ onComplete }: GameProps) {
   const { lang } = useLang()
   const c = COPY[lang]
   const LABELS = c.phases
@@ -130,6 +131,7 @@ export function BreathingGame() {
         rafRef.current = null
         setElapsed(total)
         setStatus("done")
+        onComplete?.()
         return
       }
       setElapsed(elapsedRef.current)

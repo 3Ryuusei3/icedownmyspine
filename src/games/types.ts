@@ -5,6 +5,8 @@ export type WinPayload = {
 
 export type GameProps = {
   onWin?: (payload?: WinPayload) => void
+  /** Avisa de una partida completada sin abrir el modal de victoria (juegos de relajación). */
+  onComplete?: () => void
   /** Cambia a otro juego (para juegos con sus propios menús, como los niveles de Simón). */
   onSwapGame?: () => void
 }
