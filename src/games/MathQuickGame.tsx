@@ -23,7 +23,7 @@ const COPY = {
     result: "Resultado",
     placeholder: "Número",
     check: "Comprobar",
-    wrong: "No coincide. Puedes volver a calcular con calma.",
+    wrong: "No coincide. Calcula de nuevo con calma.",
   },
   en: {
     all: "All",
@@ -33,7 +33,7 @@ const COPY = {
     result: "Result",
     placeholder: "Number",
     check: "Check",
-    wrong: "That doesn't match. You can work it out again, calmly.",
+    wrong: "Doesn't match. Take your time and try again.",
   },
 }
 
@@ -96,7 +96,7 @@ function buildMathPuzzle(filter: MathQuickFilter): MathPuzzle {
   return Math.random() < 0.5 ? pickMultiplication() : pickDivision()
 }
 
-export function MathQuickGame({ onWin }: GameProps) {
+export function MathQuickGame({ onWin, onStatusChange }: GameProps) {
   const { lang } = useLang()
   const c = COPY[lang]
   const [filter, setFilter] = useState<MathQuickFilter>(readStoredFilter)
@@ -139,6 +139,12 @@ export function MathQuickGame({ onWin }: GameProps) {
       setFeedback("bad")
     }
   }
+
+  // El mensaje de error se muestra fuera de la caja, encima (lo pinta la página).
+  const errorText = feedback === "bad" ? c.wrong : null
+  useEffect(() => {
+    onStatusChange?.(errorText, "error")
+  }, [errorText, onStatusChange])
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
@@ -205,11 +211,6 @@ export function MathQuickGame({ onWin }: GameProps) {
       <Button type="button" className="min-h-10 w-full text-sm sm:min-h-11 sm:text-base" onClick={check}>
         {c.check}
       </Button>
-      <p
-        className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
-      >
-        {c.wrong}
-      </p>
     </div>
   )
 }

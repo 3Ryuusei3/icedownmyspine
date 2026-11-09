@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { GameProps } from "@/games/types";
 import { useLang } from "@/lib/language";
@@ -252,7 +252,7 @@ const COPY = {
   },
 };
 
-export function CompareNumbersGame({ onWin }: GameProps) {
+export function CompareNumbersGame({ onWin, onStatusChange }: GameProps) {
   const { lang } = useLang();
   const c = COPY[lang];
   const puzzle = useStableRandom(() => buildPuzzle());
@@ -282,6 +282,12 @@ export function CompareNumbersGame({ onWin }: GameProps) {
       window.setTimeout(() => setWrong(false), 500);
     }
   }
+
+  // El mensaje de error se muestra fuera de la caja, encima (lo pinta la página).
+  const errorText = wrong ? c.wrong : null;
+  useEffect(() => {
+    onStatusChange?.(errorText, "error");
+  }, [errorText, onStatusChange]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -335,12 +341,6 @@ export function CompareNumbersGame({ onWin }: GameProps) {
           </span>
         </Button>
       </div>
-      <p
-        className={`text-destructive text-center text-sm ${wrong ? "" : "invisible"}`}
-        role="status"
-      >
-        {c.wrong}
-      </p>
     </div>
   );
 }

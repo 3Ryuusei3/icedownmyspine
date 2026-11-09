@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NumericKeypad } from "@/components/numeric-keypad";
 import type { GameProps } from "@/games/types";
@@ -30,7 +30,7 @@ const COPY = {
       `Celda fila ${r} columna ${c}${v === 0 ? ", vacía" : `, valor ${v}`}`,
     keypadPick: "Teclado numérico: elige una celda vacía para escribir",
     check: "Comprobar solución",
-    wrong: "Revisa celdas vacías o números repetidos en fila, columna o bloque.",
+    wrong: "Hay celdas vacías o números repetidos.",
   },
   en: {
     grid: "Sudoku 9 by 9",
@@ -38,11 +38,11 @@ const COPY = {
       `Cell row ${r} column ${c}${v === 0 ? ", empty" : `, value ${v}`}`,
     keypadPick: "Number keypad: pick an empty cell to type in",
     check: "Check solution",
-    wrong: "Check for empty cells or repeated numbers in a row, column or block.",
+    wrong: "There are empty cells or repeated numbers.",
   },
 };
 
-export function Sudoku9Game({ onWin }: GameProps) {
+export function Sudoku9Game({ onWin, onStatusChange }: GameProps) {
   const { lang } = useLang();
   const c = COPY[lang];
   const ui = useUi();
@@ -101,6 +101,12 @@ export function Sudoku9Game({ onWin }: GameProps) {
   }
 
   const rows = chunk(cells, SIZE);
+
+  // El mensaje de error se muestra fuera de la caja, encima (lo pinta la página).
+  const errorText = feedback === "bad" ? c.wrong : null;
+  useEffect(() => {
+    onStatusChange?.(errorText, "error");
+  }, [errorText, onStatusChange]);
 
   return (
     <div
@@ -173,11 +179,6 @@ export function Sudoku9Game({ onWin }: GameProps) {
       >
         {c.check}
       </Button>
-      <p
-        className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
-      >
-        {c.wrong}
-      </p>
     </div>
   );
 }

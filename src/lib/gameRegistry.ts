@@ -53,6 +53,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "sequence",
     category: "game",
+    statusLine: true,
     text: {
       es: {
         title: "Siguiente número",
@@ -70,6 +71,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "math",
     category: "game",
+    statusLine: true,
     text: {
       es: {
         title: "Cuenta rápida",
@@ -87,6 +89,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "count",
     category: "game",
+    statusLine: true,
     text: {
       es: {
         title: "Contar emojis",
@@ -174,6 +177,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "sudoku9",
     category: "game",
+    statusLine: true,
     timed: true,
     text: {
       es: {
@@ -210,6 +214,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "orderTap",
     category: "game",
+    statusLine: true,
     timed: true,
     text: {
       es: {
@@ -228,6 +233,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "categoryNames",
     category: "relax",
+    statusLine: true,
     text: {
       es: {
         title: "3 por categoría",
@@ -245,6 +251,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "compareNumbers",
     category: "game",
+    statusLine: true,
     text: {
       es: {
         title: "¿Cuál es mayor?",

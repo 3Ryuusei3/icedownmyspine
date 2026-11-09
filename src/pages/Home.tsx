@@ -111,10 +111,13 @@ export function Home() {
   const [statusEntry, setStatusEntry] = useState<{
     key: string;
     text: string | null;
+    tone?: "error";
   } | null>(null);
   const statusText = statusEntry?.key === gameKey ? statusEntry.text : null;
+  const statusTone = statusEntry?.key === gameKey ? statusEntry.tone : undefined;
   const handleStatus = useCallback(
-    (text: string | null) => setStatusEntry({ key: gameKey, text }),
+    (text: string | null, tone?: "error") =>
+      setStatusEntry({ key: gameKey, text, tone }),
     [gameKey],
   );
   useEffect(() => {
@@ -209,7 +212,10 @@ export function Home() {
             {game.statusLine ? (
               <p
                 className={cn(
-                  "text-muted-foreground -mb-1 min-h-5 text-right text-sm tabular-nums",
+                  "-mb-1 min-h-5 text-right text-sm tabular-nums",
+                  statusTone === "error"
+                    ? "text-destructive"
+                    : "text-muted-foreground",
                   statusText === null && "invisible",
                 )}
                 aria-live="off"

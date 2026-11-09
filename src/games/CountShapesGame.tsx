@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -109,7 +109,7 @@ type PlacedEmoji = {
   style: { left: string; top: string }
 }
 
-export function CountShapesGame({ onWin }: GameProps) {
+export function CountShapesGame({ onWin, onStatusChange }: GameProps) {
   const { lang } = useLang()
   const c = COPY[lang]
   const round = useStableRandom(() => {
@@ -181,6 +181,12 @@ export function CountShapesGame({ onWin }: GameProps) {
     }
   }
 
+  // El mensaje de error se muestra fuera de la caja, encima (lo pinta la página).
+  const errorText = feedback === "bad" ? c.wrong : null
+  useEffect(() => {
+    onStatusChange?.(errorText, "error")
+  }, [errorText, onStatusChange])
+
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
       <p className="text-center text-base font-medium text-pretty sm:text-lg">
@@ -228,11 +234,6 @@ export function CountShapesGame({ onWin }: GameProps) {
       <Button type="button" className="min-h-10 w-full text-sm sm:min-h-11 sm:text-base" onClick={check}>
         {c.check}
       </Button>
-      <p
-        className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
-      >
-        {c.wrong}
-      </p>
     </div>
   )
 }

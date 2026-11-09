@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -90,7 +90,7 @@ const PROMPTS = [
   },
 ] as const
 
-export function CategoryNamesGame({ onWin }: GameProps) {
+export function CategoryNamesGame({ onWin, onStatusChange }: GameProps) {
   const { lang } = useLang()
   const t = COPY[lang]
   const basePrompt = useStableRandom(
@@ -116,6 +116,12 @@ export function CategoryNamesGame({ onWin }: GameProps) {
       solutionText: t.solution(prompt.title, a.trim(), b.trim(), c.trim()),
     })
   }
+
+  // El mensaje de error se muestra fuera de la caja, encima (lo pinta la página).
+  const errorText = submitHint ? t.hint : null
+  useEffect(() => {
+    onStatusChange?.(errorText, "error")
+  }, [errorText, onStatusChange])
 
   return (
     <div className="flex w-full flex-col gap-4 max-sm:gap-2">
@@ -173,11 +179,6 @@ export function CategoryNamesGame({ onWin }: GameProps) {
       <Button type="button" className="min-h-10 w-full text-sm sm:min-h-11 sm:text-base" onClick={check}>
         {t.done}
       </Button>
-      <p
-        className={`text-destructive text-center text-sm ${submitHint ? "" : "invisible"}`}
-      >
-        {t.hint}
-      </p>
     </div>
   )
 }

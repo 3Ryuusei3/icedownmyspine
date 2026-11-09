@@ -53,7 +53,7 @@ const COPY = {
   },
 };
 
-export function OrderTapGame({ onWin }: GameProps) {
+export function OrderTapGame({ onWin, onStatusChange }: GameProps) {
   const { lang } = useLang();
   const c = COPY[lang];
   const round = useStableRandom(() => buildOrderRound());
@@ -102,17 +102,17 @@ export function OrderTapGame({ onWin }: GameProps) {
   }
   const gridLabel = c.grid(round.start, round.end);
 
+  // El mensaje de error se muestra fuera de la caja, encima (lo pinta la página).
+  const errorText = wrongFlash ? c.wrong(round.start) : null;
+  useEffect(() => {
+    onStatusChange?.(errorText, "error");
+  }, [errorText, onStatusChange]);
+
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
       <p className="text-center text-base font-medium tabular-nums sm:text-lg">
         {c.from} <span className="text-foreground">{round.start}</span>{" "}
         {c.to} <span className="text-foreground">{round.end}</span>
-      </p>
-      <p
-        className={`text-destructive text-center text-sm font-medium ${wrongFlash ? "animate-pulse" : "invisible"}`}
-        aria-live="polite"
-      >
-        {c.wrong(round.start)}
       </p>
       <div
         className="mx-auto grid w-full max-w-sm grid-cols-5 gap-1.5 sm:max-w-md sm:gap-2.5"
