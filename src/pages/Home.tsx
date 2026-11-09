@@ -111,6 +111,7 @@ export function Home() {
                     <GameComponent
                       key={`${gameId}-${session}-${replayNonce}`}
                       onWin={handleWin}
+                      onSwapGame={swapGame}
                     />
                   </div>
                 </div>

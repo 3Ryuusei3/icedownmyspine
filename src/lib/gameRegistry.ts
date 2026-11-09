@@ -9,6 +9,8 @@ import { MemoryPairsGame } from "@/games/MemoryPairsGame";
 import { OrderTapGame } from "@/games/OrderTapGame";
 import { SequenceGame } from "@/games/SequenceGame";
 import { Sudoku9Game } from "@/games/Sudoku9Game";
+import { SimonGame } from "@/games/SimonGame";
+import { MemoryGridGame } from "@/games/MemoryGridGame";
 import type { GameProps } from "@/games/types";
 
 export type GameId =
@@ -21,7 +23,9 @@ export type GameId =
   | "memory"
   | "orderTap"
   | "categoryNames"
-  | "compareNumbers";
+  | "compareNumbers"
+  | "simon"
+  | "memoryGrid";
 
 export type GameDefinition = {
   id: GameId;
@@ -97,6 +101,20 @@ export const GAMES: GameDefinition[] = [
     title: "¿Cuál es mayor?",
     description: "Elige la opción cuyo resultado sea el mayor.",
     component: CompareNumbersGame,
+  },
+  {
+    id: "simon",
+    title: "Simón",
+    description:
+      "Mira la secuencia de colores y repítela en el mismo orden. Son 3 niveles con 4 colores: la secuencia a recordar tiene 4, 5 y 6 pasos. Si fallas, puedes reintentar el nivel o reiniciar la partida.",
+    component: SimonGame,
+  },
+  {
+    id: "memoryGrid",
+    title: "Recuerda la cuadrícula",
+    description:
+      "Se iluminan entre 5 y 15 casillas de una cuadrícula de 5x5. Memorízalas y márcalas cuando se apaguen.",
+    component: MemoryGridGame,
   },
 ];
 

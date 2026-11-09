@@ -1,0 +1,244 @@
+import { useCallback, useEffect, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
+import type { GameProps } from "@/games/types"
+
+type Pad = { label: string; idle: string; lit: string }
+
+const PADS: Pad[] = [
+  { label: "Rojo", idle: "bg-red-500/35", lit: "bg-red-500 shadow-lg shadow-red-500/50" },
+  { label: "Azul", idle: "bg-blue-500/35", lit: "bg-blue-500 shadow-lg shadow-blue-500/50" },
+  { label: "Verde", idle: "bg-green-500/35", lit: "bg-green-500 shadow-lg shadow-green-500/50" },
+  { label: "Amarillo", idle: "bg-yellow-400/35", lit: "bg-yellow-400 shadow-lg shadow-yellow-400/50" },
+]
+
+const PAD_COUNT = 4
+
+/** Longitud de la secuencia por nivel. */
+const LEVELS = [{ length: 4 }, { length: 5 }, { length: 6 }]
+
+const STEP_MS = 650
+const LIT_MS = 400
+
+const BTN = "min-h-10 w-full sm:min-h-11"
+const ROW_BTN =
+  "min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
+
+type Phase = "idle" | "showing" | "input" | "failed" | "levelUp" | "won"
+
+function buildSequence(length: number) {
+  return Array.from({ length }, () => Math.floor(Math.random() * PAD_COUNT))
+}
+
+export function SimonGame({ onWin, onSwapGame }: GameProps) {
+  const [level, setLevel] = useState(0)
+  const [sequence, setSequence] = useState<number[]>([])
+  const [phase, setPhase] = useState<Phase>("idle")
+  const [lit, setLit] = useState<number | null>(null)
+  const [inputIdx, setInputIdx] = useState(0)
+
+  const timeouts = useRef<ReturnType<typeof setTimeout>[]>([])
+
+  const clearTimers = useCallback(() => {
+    timeouts.current.forEach(clearTimeout)
+    timeouts.current = []
+  }, [])
+
+  useEffect(() => clearTimers, [clearTimers])
+
+  const later = useCallback((fn: () => void, ms: number) => {
+    timeouts.current.push(setTimeout(fn, ms))
+  }, [])
+
+  const flash = useCallback(
+    (pad: number) => {
+      setLit(pad)
+      later(() => setLit(null), LIT_MS)
+    },
+    [later],
+  )
+
+  const playLevel = useCallback(
+    (lvl: number) => {
+      clearTimers()
+      const { length } = LEVELS[lvl]!
+      const seq = buildSequence(length)
+      setLevel(lvl)
+      setSequence(seq)
+      setInputIdx(0)
+      setLit(null)
+      setPhase("showing")
+      seq.forEach((pad, i) => later(() => flash(pad), 700 + i * STEP_MS))
+      later(() => setPhase("input"), 700 + seq.length * STEP_MS)
+    },
+    [clearTimers, flash, later],
+  )
+
+  function restart() {
+    clearTimers()
+    setLevel(0)
+    setSequence([])
+    setInputIdx(0)
+    setLit(null)
+    setPhase("idle")
+  }
+
+  function onPad(pad: number) {
+    if (phase !== "input") return
+    flash(pad)
+    if (pad !== sequence[inputIdx]) {
+      setPhase("failed")
+      return
+    }
+    const next = inputIdx + 1
+    if (next < sequence.length) {
+      setInputIdx(next)
+      return
+    }
+    if (level + 1 < LEVELS.length) {
+      // Pequeña pausa para ver el último color antes del aviso de nivel superado.
+      later(() => setPhase("levelUp"), LIT_MS)
+    } else {
+      setPhase("won")
+      onWin?.({
+        solutionText: "Completaste los 3 niveles: secuencias de 4, 5 y 6 colores. ¡Gran memoria!",
+      })
+    }
+  }
+
+  const { length } = LEVELS[level]!
+
+  let status = "Pulsa «Empezar» para ver la secuencia."
+  if (phase === "showing") status = "Mira la secuencia…"
+  if (phase === "input") status = `Tu turno: ${inputIdx} / ${sequence.length}`
+  if (phase === "failed") status = "Te has equivocado. Inténtalo de nuevo."
+  if (phase === "levelUp") status = `¡Nivel ${level + 1} superado!`
+  if (phase === "won") status = "¡Completaste los 3 niveles!"
+
+  return (
+    <div className="flex flex-col gap-4 max-sm:gap-3">
+      <p className="text-center text-base font-medium sm:text-lg">
+        Nivel {level + 1} de {LEVELS.length} · {length} colores
+      </p>
+      <p
+        className={cn(
+          "min-h-5 text-center text-sm",
+          phase === "failed" && "text-destructive font-medium",
+          (phase === "levelUp" || phase === "won") &&
+            "font-medium text-emerald-600 dark:text-emerald-400",
+          phase !== "failed" &&
+            phase !== "levelUp" &&
+            phase !== "won" &&
+            "text-muted-foreground",
+        )}
+        aria-live="polite"
+      >
+        {status}
+      </p>
+      <div
+        className="mx-auto grid w-full max-w-sm grid-cols-2 gap-2 sm:max-w-md sm:gap-3"
+        role="group"
+        aria-label="Botones de Simón"
+      >
+        {PADS.map((p, i) => (
+          <button
+            key={p.label}
+            type="button"
+            aria-label={p.label}
+            disabled={phase !== "input"}
+            onClick={() => onPad(i)}
+            className={cn(
+              "aspect-square rounded-2xl transition-all duration-150 active:scale-95 disabled:cursor-default",
+              lit === i ? p.lit : p.idle,
+              lit === i && "scale-[1.03]",
+            )}
+          />
+        ))}
+      </div>
+      {/* Siempre dos botones en la misma fila para que la altura no cambie. */}
+      <div className="flex flex-row gap-2">
+        <Button
+          type="button"
+          variant="secondary"
+          className={ROW_BTN}
+          disabled={phase === "idle"}
+          onClick={restart}
+        >
+          Reiniciar
+        </Button>
+        {phase === "won" ? (
+          <Button
+            type="button"
+            className={ROW_BTN}
+            disabled={!onSwapGame}
+            onClick={onSwapGame}
+          >
+            Jugar a otro
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            className={ROW_BTN}
+            disabled={phase !== "idle" && phase !== "failed"}
+            onClick={() => playLevel(phase === "idle" ? 0 : level)}
+          >
+            {phase === "idle" ? "Empezar" : "Reintentar nivel"}
+          </Button>
+        )}
+      </div>
+
+      <Dialog open={phase === "levelUp"}>
+        <DialogContent
+          className="sm:max-w-md"
+          showCloseButton={false}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle>¡Nivel {level + 1} superado!</DialogTitle>
+            <DialogDescription>
+              Siguiente reto: una secuencia de {LEVELS[level + 1]?.length ?? length}{" "}
+              colores.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-2 pt-2">
+            <Button
+              type="button"
+              className={BTN}
+              onClick={() => playLevel(level + 1)}
+            >
+              Continuar con el nivel {level + 2}/{LEVELS.length}
+            </Button>
+            <div className="flex flex-row gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                className={ROW_BTN}
+                onClick={restart}
+              >
+                Reiniciar
+              </Button>
+              {onSwapGame ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className={ROW_BTN}
+                  onClick={onSwapGame}
+                >
+                  Jugar a otro
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
