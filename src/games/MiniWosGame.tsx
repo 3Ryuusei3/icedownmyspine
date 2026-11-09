@@ -123,10 +123,12 @@ const MIN_LETTERS = 4;
 /** Sin acertar palabra: primera pista; después, una pista cada este intervalo. */
 const FIRST_WORD_HINT_MS = 15_000;
 const WORD_HINT_INTERVAL_MS = 20_000;
+/** El contador «Siguiente pista en Xs» aparece en los últimos segundos antes de cada pista. */
+const HINT_COUNTDOWN_SHOW_MS = 10_000;
 
 type InputFlash = "idle" | "error" | "success";
 
-export function MiniWosGame({ onWin }: GameProps) {
+export function MiniWosGame({ onWin, onStatusChange }: GameProps) {
   const combo = useStableRandom(() => {
     const list = miniWosData.combinations;
     return list[Math.floor(Math.random() * list.length)]!;
@@ -157,6 +159,7 @@ export function MiniWosGame({ onWin }: GameProps) {
     word: string;
     i: number;
   } | null>(null);
+  const [hintCountdown, setHintCountdown] = useState<number | null>(null);
   const [value, setValue] = useState("");
   const [inputFlash, setInputFlash] = useState<InputFlash>("idle");
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -233,13 +236,14 @@ export function MiniWosGame({ onWin }: GameProps) {
   useEffect(() => {
     if (found.size >= palabrasCompletas.length) return;
 
-    const giveHint = () => {
+    // Devuelve false si ya no quedan letras que revelar.
+    const giveHint = (): boolean => {
       const { next, pick } = addRandomLetterHint(
         hintsRef.current,
         palabrasRef.current,
         foundRef.current,
       );
-      if (pick === null && next === hintsRef.current) return;
+      if (pick === null && next === hintsRef.current) return false;
       hintsRef.current = next;
       setHintsByWord(next);
       if (pick) {
@@ -250,17 +254,31 @@ export function MiniWosGame({ onWin }: GameProps) {
           hintFlipClearRef.current = null;
         }, 600);
       }
+      return true;
     };
 
-    let repeatId: ReturnType<typeof setInterval> | null = null;
-    const firstId = window.setTimeout(() => {
-      giveHint();
-      repeatId = window.setInterval(giveHint, WORD_HINT_INTERVAL_MS);
-    }, FIRST_WORD_HINT_MS);
+    let deadline = Date.now() + FIRST_WORD_HINT_MS;
+    let exhausted = false;
+    const tick = () => {
+      if (exhausted) {
+        setHintCountdown(null);
+        return;
+      }
+      const left = deadline - Date.now();
+      if (left <= 0) {
+        exhausted = !giveHint();
+        deadline = Date.now() + WORD_HINT_INTERVAL_MS;
+        setHintCountdown(null);
+        return;
+      }
+      setHintCountdown(
+        left <= HINT_COUNTDOWN_SHOW_MS ? Math.ceil(left / 1000) : null,
+      );
+    };
+    const tickId = window.setInterval(tick, 250);
 
     return () => {
-      window.clearTimeout(firstId);
-      if (repeatId !== null) window.clearInterval(repeatId);
+      window.clearInterval(tickId);
       clearHintFlipTimer();
     };
   }, [found.size, palabrasCompletas.length]);
@@ -274,6 +292,15 @@ export function MiniWosGame({ onWin }: GameProps) {
     }, SHUFFLE_MS);
     return () => window.clearInterval(id);
   }, [combo.letras]);
+
+  // «Siguiente pista en Xs» se muestra fuera de la caja del juego (lo pinta la página).
+  const hintText =
+    hintCountdown !== null && found.size < palabrasCompletas.length
+      ? `Siguiente pista en ${hintCountdown}s`
+      : null;
+  useEffect(() => {
+    onStatusChange?.(hintText);
+  }, [hintText, onStatusChange]);
 
   const normToCanonical = useMemo(() => {
     const m = new Map<string, string>();

@@ -39,6 +39,8 @@ export type GameText = { title: string; description: string };
 export type GameDefinition = {
   id: GameId;
   category: GameCategory;
+  /** Si el juego usa la línea de estado exterior (reserva su altura). */
+  statusLine?: boolean;
   /** Si el tiempo de partida es significativo (se guarda el mejor tiempo). */
   timed?: boolean;
   /** Idiomas en los que está disponible; todos si se omite. */
@@ -102,6 +104,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "anagram",
     category: "game",
+    statusLine: true,
     langs: ["es"],
     text: {
       es: {

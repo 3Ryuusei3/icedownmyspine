@@ -3,6 +3,7 @@ import { GamePicker } from "@/components/game-picker";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -106,6 +107,16 @@ export function Home() {
 
   const startedAt = useRef(Date.now());
   const gameKey = `${gameId}-${session}-${replayNonce}-${lang}`;
+  // Texto de estado que algunos juegos muestran fuera de su caja; se ignora si es de otra partida.
+  const [statusEntry, setStatusEntry] = useState<{
+    key: string;
+    text: string | null;
+  } | null>(null);
+  const statusText = statusEntry?.key === gameKey ? statusEntry.text : null;
+  const handleStatus = useCallback(
+    (text: string | null) => setStatusEntry({ key: gameKey, text }),
+    [gameKey],
+  );
   useEffect(() => {
     startedAt.current = Date.now();
   }, [gameKey]);
@@ -195,6 +206,17 @@ export function Home() {
 
         <div className="-mx-1 flex min-h-0 flex-1 flex-col overflow-y-auto px-1 [-webkit-overflow-scrolling:touch]">
           <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-2 py-1 sm:gap-4 sm:py-2">
+            {game.statusLine ? (
+              <p
+                className={cn(
+                  "text-muted-foreground -mb-1 min-h-5 text-right text-sm tabular-nums",
+                  statusText === null && "invisible",
+                )}
+                aria-live="off"
+              >
+                {statusText ?? "\u00a0"}
+              </p>
+            ) : null}
             <Card className="max-sm:gap-2 max-sm:py-3 shrink-0 overflow-hidden shadow-sm sm:gap-4 sm:py-4">
               <CardContent className="max-sm:px-3 sm:px-4">
                 <div className="flex flex-col items-center px-1 py-1 sm:px-2 sm:py-2">
@@ -203,6 +225,7 @@ export function Home() {
                       key={gameKey}
                       onWin={handleWin}
                       onComplete={handleComplete}
+                      onStatusChange={handleStatus}
                       onSwapGame={swapGame}
                     />
                   </div>
