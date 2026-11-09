@@ -82,14 +82,12 @@ export function OrderTapGame({ onWin }: GameProps) {
         En esta partida: del <span className="text-foreground">{round.start}</span>{" "}
         al <span className="text-foreground">{round.end}</span>
       </p>
-      {wrongFlash ? (
-        <p
-          className="text-destructive animate-pulse text-center text-sm font-medium"
-          aria-live="polite"
-        >
-          Orden incorrecto — empieza otra vez por el {round.start}.
-        </p>
-      ) : null}
+      <p
+        className={`text-destructive text-center text-sm font-medium ${wrongFlash ? "animate-pulse" : "invisible"}`}
+        aria-live="polite"
+      >
+        Orden incorrecto — empieza otra vez por el {round.start}.
+      </p>
       <div
         className="mx-auto grid w-full max-w-sm grid-cols-5 gap-1.5 sm:max-w-md sm:gap-2.5"
         role="grid"

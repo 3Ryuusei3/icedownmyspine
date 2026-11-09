@@ -179,11 +179,11 @@ export function MathQuickGame({ onWin }: GameProps) {
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         Comprobar
       </Button>
-      {feedback === "bad" && (
-        <p className="text-center text-sm text-destructive">
-          No coincide. Puedes volver a calcular con calma.
-        </p>
-      )}
+      <p
+        className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
+      >
+        No coincide. Puedes volver a calcular con calma.
+      </p>
     </div>
   )
 }

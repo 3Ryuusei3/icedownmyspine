@@ -13,10 +13,10 @@ import type { GameProps } from "@/games/types"
 type Pad = { label: string; idle: string; lit: string }
 
 const PADS: Pad[] = [
-  { label: "Rojo", idle: "bg-red-500/35", lit: "bg-red-500 shadow-lg shadow-red-500/50" },
-  { label: "Azul", idle: "bg-blue-500/35", lit: "bg-blue-500 shadow-lg shadow-blue-500/50" },
-  { label: "Verde", idle: "bg-green-500/35", lit: "bg-green-500 shadow-lg shadow-green-500/50" },
-  { label: "Amarillo", idle: "bg-yellow-400/35", lit: "bg-yellow-400 shadow-lg shadow-yellow-400/50" },
+  { label: "Rojo", idle: "bg-red-400/30", lit: "bg-red-400 shadow-lg shadow-red-400/50" },
+  { label: "Azul", idle: "bg-sky-400/30", lit: "bg-sky-400 shadow-lg shadow-sky-400/50" },
+  { label: "Verde", idle: "bg-emerald-400/30", lit: "bg-emerald-400 shadow-lg shadow-emerald-400/50" },
+  { label: "Amarillo", idle: "bg-amber-300/30", lit: "bg-amber-300 shadow-lg shadow-amber-300/50" },
 ]
 
 const PAD_COUNT = 4

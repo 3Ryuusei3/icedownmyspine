@@ -149,11 +149,11 @@ export function Sudoku9Game({ onWin }: GameProps) {
       >
         Comprobar solución
       </Button>
-      {feedback === "bad" && (
-        <p className="text-center text-sm text-destructive">
-          Revisa celdas vacías o números repetidos en fila, columna o bloque.
-        </p>
-      )}
+      <p
+        className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
+      >
+        Revisa celdas vacías o números repetidos en fila, columna o bloque.
+      </p>
     </div>
   );
 }

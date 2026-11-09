@@ -319,11 +319,12 @@ export function CompareNumbersGame({ onWin }: GameProps) {
           </span>
         </Button>
       </div>
-      {wrong ? (
-        <p className="text-destructive text-center text-sm" role="status">
-          Repasa el cálculo y elige otra vez.
-        </p>
-      ) : null}
+      <p
+        className={`text-destructive text-center text-sm ${wrong ? "" : "invisible"}`}
+        role="status"
+      >
+        Repasa el cálculo y elige otra vez.
+      </p>
     </div>
   );
 }

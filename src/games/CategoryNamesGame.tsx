@@ -135,11 +135,11 @@ export function CategoryNamesGame({ onWin }: GameProps) {
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         He puesto tres cosas
       </Button>
-      {submitHint ? (
-        <p className="text-destructive text-center text-sm">
-          Rellena las tres casillas.
-        </p>
-      ) : null}
+      <p
+        className={`text-destructive text-center text-sm ${submitHint ? "" : "invisible"}`}
+      >
+        Rellena las tres casillas.
+      </p>
     </div>
   )
 }

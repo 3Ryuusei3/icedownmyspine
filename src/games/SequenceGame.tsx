@@ -98,11 +98,11 @@ export function SequenceGame({ onWin }: GameProps) {
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         Comprobar
       </Button>
-      {feedback === "bad" && (
-        <p className="text-center text-sm text-destructive">
-          Aún no. Respira e inténtalo de nuevo.
-        </p>
-      )}
+      <p
+        className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
+      >
+        Aún no. Respira e inténtalo de nuevo.
+      </p>
     </div>
   )
 }

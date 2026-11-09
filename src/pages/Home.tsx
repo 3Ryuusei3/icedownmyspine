@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GamePicker } from "@/components/game-picker";
-import { ModeToggle } from "@/components/mode-toggle";
+import { PalettePicker } from "@/components/palette-picker";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -78,9 +78,17 @@ export function Home() {
       <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col px-3 py-3 sm:px-6 sm:py-10">
         <header className="mb-3 flex shrink-0 flex-wrap items-start justify-between gap-2 sm:mb-6 sm:gap-4">
           <div className="min-w-0 flex-1 text-left">
-            <h1 className="text-balance text-xl font-semibold tracking-tight sm:text-3xl">
-              Ice Down Your Spine
-            </h1>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <img
+                src="/icon-192.png"
+                alt=""
+                aria-hidden
+                className="size-6 shrink-0 rotate-[15deg] sm:size-8"
+              />
+              <h1 className="text-balance text-xl font-semibold tracking-tight sm:text-3xl">
+                Ice Down Your Spine
+              </h1>
+            </div>
             <p className="text-muted-foreground mt-1 max-w-md text-pretty text-xs leading-snug sm:mt-2 sm:text-sm sm:leading-relaxed">
               Minijuegos sencillos para desviar la atención. No hay puntuación
               ni prisa.
@@ -88,11 +96,11 @@ export function Home() {
           </div>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
-            <ModeToggle />
+            <PalettePicker />
           </div>
         </header>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto [-webkit-overflow-scrolling:touch]">
+        <div className="-mx-1 flex min-h-0 flex-1 flex-col overflow-y-auto px-1 [-webkit-overflow-scrolling:touch]">
           <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-2 py-1 sm:gap-4 sm:py-2">
             <Card className="border-border/60 bg-muted/50 max-sm:gap-2 max-sm:py-3 shrink-0 shadow-sm dark:bg-muted/25 sm:gap-4 sm:py-4">
               <CardHeader className="space-y-1 max-sm:px-3 max-sm:pb-2 pb-4 sm:px-4">

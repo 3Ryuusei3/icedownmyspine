@@ -33,7 +33,7 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="max-h-[min(90vh,32rem)] gap-4 overflow-y-auto sm:max-w-lg"
+        className="max-h-[90vh] gap-4 overflow-y-auto sm:max-w-lg"
         showCloseButton
       >
         <DialogHeader>

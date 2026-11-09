@@ -200,11 +200,11 @@ export function CountShapesGame({ onWin }: GameProps) {
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
         Comprobar
       </Button>
-      {feedback === "bad" && (
-        <p className="text-center text-sm text-destructive">
-          Cuenta otra vez con tranquilidad.
-        </p>
-      )}
+      <p
+        className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
+      >
+        Cuenta otra vez con tranquilidad.
+      </p>
     </div>
   )
 }
