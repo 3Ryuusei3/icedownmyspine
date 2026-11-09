@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GamePicker } from "@/components/game-picker";
 import { PalettePicker } from "@/components/palette-picker";
+import { SettingsDialog } from "@/components/settings-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,10 +18,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { WinPayload } from "@/games/types";
+import { useRotation } from "@/hooks/use-rotation";
 import { getGameById, pickRandomGame, type GameId } from "@/lib/gameRegistry";
 
 export function Home() {
-  const initial = useMemo(() => pickRandomGame(), []);
+  const { enabled, setEnabled } = useRotation();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- solo la partida inicial
+  const initial = useMemo(() => pickRandomGame(undefined, enabled), []);
   const [gameId, setGameId] = useState<GameId>(initial.id);
   const [session, setSession] = useState(0);
   const [replayNonce, setReplayNonce] = useState(0);
@@ -35,10 +39,10 @@ export function Home() {
   }, []);
 
   const swapGame = useCallback(() => {
-    const next = pickRandomGame(gameId);
+    const next = pickRandomGame(gameId, enabled);
     setGameId(next.id);
     setSession((s) => s + 1);
-  }, [gameId]);
+  }, [gameId, enabled]);
 
   const selectGameFromMenu = useCallback((id: GameId) => {
     setGameId(id);
@@ -68,10 +72,10 @@ export function Home() {
   const playAnotherGame = useCallback(() => {
     setWinOpen(false);
     setWinSolution(null);
-    const next = pickRandomGame(gameId);
+    const next = pickRandomGame(gameId, enabled);
     setGameId(next.id);
     setSession((s) => s + 1);
-  }, [gameId]);
+  }, [gameId, enabled]);
 
   return (
     <div className="bg-background text-foreground flex min-h-svh flex-col">
@@ -96,6 +100,7 @@ export function Home() {
           </div>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
+            <SettingsDialog enabled={enabled} onChange={setEnabled} />
             <PalettePicker />
           </div>
         </header>
