@@ -1,4 +1,12 @@
-export type PaletteId = "noche" | "hielo" | "bosque" | "arena" | "lavanda"
+export type PaletteId =
+  | "noche"
+  | "hielo"
+  | "bosque"
+  | "menta"
+  | "cacao"
+  | "arena"
+  | "ciruela"
+  | "lavanda"
 
 export type Palette = {
   id: PaletteId
@@ -11,7 +19,14 @@ export type Palette = {
 
 export const DEFAULT_PALETTE: PaletteId = "noche"
 
+/** De dos en dos, como se ven en la cuadrícula: clara a la izquierda, oscura a la derecha. */
 export const PALETTES: Palette[] = [
+  {
+    id: "hielo",
+    background: "oklch(0.982 0.007 232)",
+    accent: "oklch(0.43 0.07 245)",
+    themeColor: "#f6f9fb",
+  },
   {
     id: "noche",
     background: "oklch(0.19 0.025 252)",
@@ -19,10 +34,10 @@ export const PALETTES: Palette[] = [
     themeColor: "#11161f",
   },
   {
-    id: "hielo",
-    background: "oklch(0.982 0.007 232)",
-    accent: "oklch(0.43 0.07 245)",
-    themeColor: "#f6f9fb",
+    id: "menta",
+    background: "oklch(0.95 0.032 160)",
+    accent: "oklch(0.45 0.09 160)",
+    themeColor: "#e6f3ec",
   },
   {
     id: "bosque",
@@ -37,9 +52,21 @@ export const PALETTES: Palette[] = [
     themeColor: "#f8f4ea",
   },
   {
+    id: "cacao",
+    background: "oklch(0.2 0.02 55)",
+    accent: "oklch(0.8 0.08 75)",
+    themeColor: "#1d1712",
+  },
+  {
     id: "lavanda",
     background: "oklch(0.942 0.024 300)",
     accent: "oklch(0.47 0.1 295)",
     themeColor: "#ebe6f4",
+  },
+  {
+    id: "ciruela",
+    background: "oklch(0.2 0.03 310)",
+    accent: "oklch(0.8 0.09 305)",
+    themeColor: "#1b1220",
   },
 ]

@@ -10,6 +10,16 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#11161f" />
+    <script>
+      // Aplica la paleta guardada (o Medianoche) antes del primer pintado.
+      try {
+        document.documentElement.classList.add(
+          localStorage.getItem("ice-palette") || "noche",
+        );
+      } catch (e) {
+        document.documentElement.classList.add("noche");
+      }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hielo por la espalda</title>
   </head>

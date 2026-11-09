@@ -26,10 +26,13 @@ const es = {
 
   palettePicker: { aria: "Elegir paleta de colores" },
   palettes: {
-    noche: "Noche",
+    noche: "Medianoche",
     hielo: "Hielo",
     bosque: "Bosque",
+    menta: "Menta",
+    ciruela: "Ciruela",
     arena: "Arena",
+    cacao: "Cacao",
     lavanda: "Lavanda",
   } satisfies Record<PaletteId, string>,
 
@@ -89,10 +92,13 @@ const en: UiText = {
 
   palettePicker: { aria: "Choose a color palette" },
   palettes: {
-    noche: "Night",
+    noche: "Midnight",
     hielo: "Ice",
     bosque: "Forest",
+    menta: "Mint",
+    ciruela: "Plum",
     arena: "Sand",
+    cacao: "Cocoa",
     lavanda: "Lavender",
   },
 

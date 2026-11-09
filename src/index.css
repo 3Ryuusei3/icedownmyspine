@@ -3,8 +3,8 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-/* «Noche» y «Bosque» son las paletas oscuras: activan las utilidades dark:. */
-@custom-variant dark (&:is(.noche, .noche *, .bosque, .bosque *));
+/* «Medianoche», «Bosque», «Cacao» y «Ciruela» son las paletas oscuras: activan las utilidades dark:. */
+@custom-variant dark (&:is(.noche, .noche *, .bosque, .bosque *, .cacao, .cacao *, .ciruela, .ciruela *));
 
 @theme inline {
   --font-heading: var(--font-sans);
@@ -85,7 +85,7 @@
   --sidebar-ring: oklch(0.7 0.08 235);
 }
 
-/* Noche: azul marino oscuro (paleta inicial) */
+/* Medianoche: azul marino oscuro (paleta inicial) */
 .noche {
   color-scheme: dark;
   --background: oklch(0.19 0.025 252);
@@ -190,6 +190,113 @@
   --sidebar-accent-foreground: oklch(0.36 0.04 65);
   --sidebar-border: oklch(0.9 0.022 82);
   --sidebar-ring: oklch(0.68 0.08 75);
+}
+
+/* Cacao: marrón oscuro y cálido */
+.cacao {
+  color-scheme: dark;
+  --background: oklch(0.2 0.02 55);
+  --foreground: oklch(0.94 0.015 80);
+  --card: oklch(0.245 0.024 55);
+  --card-foreground: oklch(0.94 0.015 80);
+  --popover: oklch(0.245 0.024 55);
+  --popover-foreground: oklch(0.94 0.015 80);
+  --primary: oklch(0.8 0.08 75);
+  --primary-foreground: oklch(0.2 0.025 55);
+  --secondary: oklch(0.29 0.027 55);
+  --secondary-foreground: oklch(0.94 0.015 80);
+  --muted: oklch(0.28 0.025 55);
+  --muted-foreground: oklch(0.74 0.04 70);
+  --accent: oklch(0.32 0.032 55);
+  --accent-foreground: oklch(0.94 0.015 80);
+  --destructive: oklch(0.72 0.14 25);
+  --border: oklch(0.8 0.05 70 / 14%);
+  --input: oklch(0.8 0.05 70 / 18%);
+  --ring: oklch(0.6 0.07 70);
+  --chart-1: oklch(0.87 0.04 78);
+  --chart-2: oklch(0.7 0.07 75);
+  --chart-3: oklch(0.55 0.07 70);
+  --chart-4: oklch(0.43 0.06 62);
+  --chart-5: oklch(0.33 0.04 55);
+  --sidebar: oklch(0.245 0.024 55);
+  --sidebar-foreground: oklch(0.94 0.015 80);
+  --sidebar-primary: oklch(0.8 0.08 75);
+  --sidebar-primary-foreground: oklch(0.2 0.025 55);
+  --sidebar-accent: oklch(0.32 0.032 55);
+  --sidebar-accent-foreground: oklch(0.94 0.015 80);
+  --sidebar-border: oklch(0.8 0.05 70 / 14%);
+  --sidebar-ring: oklch(0.6 0.07 70);
+}
+
+/* Menta: verde claro y fresco */
+.menta {
+  --background: oklch(0.95 0.032 160);
+  --foreground: oklch(0.28 0.04 165);
+  --card: oklch(0.978 0.016 160);
+  --card-foreground: oklch(0.28 0.04 165);
+  --popover: oklch(0.978 0.016 160);
+  --popover-foreground: oklch(0.28 0.04 165);
+  --primary: oklch(0.45 0.09 160);
+  --primary-foreground: oklch(0.985 0.01 160);
+  --secondary: oklch(0.92 0.035 160);
+  --secondary-foreground: oklch(0.33 0.07 162);
+  --muted: oklch(0.92 0.032 160);
+  --muted-foreground: oklch(0.47 0.05 165);
+  --accent: oklch(0.9 0.045 160);
+  --accent-foreground: oklch(0.33 0.07 162);
+  --destructive: oklch(0.58 0.17 20);
+  --border: oklch(0.87 0.04 160);
+  --input: oklch(0.87 0.04 160);
+  --ring: oklch(0.68 0.1 160);
+  --chart-1: oklch(0.88 0.05 160);
+  --chart-2: oklch(0.72 0.09 160);
+  --chart-3: oklch(0.58 0.1 160);
+  --chart-4: oklch(0.45 0.09 160);
+  --chart-5: oklch(0.33 0.07 162);
+  --sidebar: oklch(0.95 0.032 160);
+  --sidebar-foreground: oklch(0.28 0.04 165);
+  --sidebar-primary: oklch(0.45 0.09 160);
+  --sidebar-primary-foreground: oklch(0.985 0.01 160);
+  --sidebar-accent: oklch(0.9 0.045 160);
+  --sidebar-accent-foreground: oklch(0.33 0.07 162);
+  --sidebar-border: oklch(0.87 0.04 160);
+  --sidebar-ring: oklch(0.68 0.1 160);
+}
+
+/* Ciruela: morado oscuro y tranquilo */
+.ciruela {
+  color-scheme: dark;
+  --background: oklch(0.2 0.03 310);
+  --foreground: oklch(0.95 0.012 310);
+  --card: oklch(0.25 0.035 310);
+  --card-foreground: oklch(0.95 0.012 310);
+  --popover: oklch(0.25 0.035 310);
+  --popover-foreground: oklch(0.95 0.012 310);
+  --primary: oklch(0.8 0.09 305);
+  --primary-foreground: oklch(0.2 0.035 310);
+  --secondary: oklch(0.3 0.04 310);
+  --secondary-foreground: oklch(0.95 0.012 310);
+  --muted: oklch(0.285 0.036 310);
+  --muted-foreground: oklch(0.75 0.04 305);
+  --accent: oklch(0.33 0.05 310);
+  --accent-foreground: oklch(0.95 0.012 310);
+  --destructive: oklch(0.72 0.14 20);
+  --border: oklch(0.8 0.06 305 / 15%);
+  --input: oklch(0.8 0.06 305 / 19%);
+  --ring: oklch(0.62 0.1 305);
+  --chart-1: oklch(0.87 0.05 305);
+  --chart-2: oklch(0.7 0.09 305);
+  --chart-3: oklch(0.55 0.1 308);
+  --chart-4: oklch(0.43 0.08 310);
+  --chart-5: oklch(0.33 0.05 310);
+  --sidebar: oklch(0.25 0.035 310);
+  --sidebar-foreground: oklch(0.95 0.012 310);
+  --sidebar-primary: oklch(0.8 0.09 305);
+  --sidebar-primary-foreground: oklch(0.2 0.035 310);
+  --sidebar-accent: oklch(0.33 0.05 310);
+  --sidebar-accent-foreground: oklch(0.95 0.012 310);
+  --sidebar-border: oklch(0.8 0.06 305 / 15%);
+  --sidebar-ring: oklch(0.62 0.1 305);
 }
 
 /* Lavanda: morado muy suave */
