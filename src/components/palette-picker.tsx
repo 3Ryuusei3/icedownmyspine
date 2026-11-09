@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useUi } from "@/i18n/use-ui"
 import { PALETTES } from "@/lib/palettes"
 
 const subscribe = () => () => {}
@@ -23,6 +24,7 @@ const TRIGGER_CLASS =
 
 export function PalettePicker() {
   const { theme, setTheme } = useTheme()
+  const ui = useUi()
   const mounted = useMounted()
 
   const current = PALETTES.find((p) => p.id === theme) ?? PALETTES[0]!
@@ -55,7 +57,7 @@ export function PalettePicker() {
           variant="outline"
           size="icon-lg"
           className={TRIGGER_CLASS}
-          aria-label="Elegir paleta de colores"
+          aria-label={ui.palettePicker.aria}
         >
           <PaletteIcon className="size-4 sm:size-5" aria-hidden />
         </Button>
@@ -77,7 +79,7 @@ export function PalettePicker() {
                 style={{ background: p.accent }}
               />
             </span>
-            <span className="flex-1">{p.name}</span>
+            <span className="flex-1">{ui.palettes[p.id]}</span>
             {p.id === current.id ? <Check aria-hidden /> : null}
           </DropdownMenuItem>
         ))}

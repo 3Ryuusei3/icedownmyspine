@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useUi } from "@/i18n/use-ui"
 import {
   Dialog,
   DialogContent,
@@ -8,21 +9,55 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import { useLang } from "@/lib/language"
 import type { GameProps } from "@/games/types"
 
-type Pad = { label: string; idle: string; lit: string }
+type Pad = { label: { es: string; en: string }; idle: string; lit: string }
 
 const PADS: Pad[] = [
-  { label: "Rojo", idle: "bg-red-400/30", lit: "bg-red-400 shadow-lg shadow-red-400/50" },
-  { label: "Azul", idle: "bg-sky-400/30", lit: "bg-sky-400 shadow-lg shadow-sky-400/50" },
-  { label: "Verde", idle: "bg-emerald-400/30", lit: "bg-emerald-400 shadow-lg shadow-emerald-400/50" },
-  { label: "Amarillo", idle: "bg-amber-300/30", lit: "bg-amber-300 shadow-lg shadow-amber-300/50" },
+  { label: { es: "Rojo", en: "Red" }, idle: "bg-red-400/30", lit: "bg-red-400 shadow-lg shadow-red-400/50" },
+  { label: { es: "Azul", en: "Blue" }, idle: "bg-sky-400/30", lit: "bg-sky-400 shadow-lg shadow-sky-400/50" },
+  { label: { es: "Verde", en: "Green" }, idle: "bg-emerald-400/30", lit: "bg-emerald-400 shadow-lg shadow-emerald-400/50" },
+  { label: { es: "Amarillo", en: "Yellow" }, idle: "bg-amber-300/30", lit: "bg-amber-300 shadow-lg shadow-amber-300/50" },
 ]
 
 const PAD_COUNT = 4
 
 /** Longitud de la secuencia por nivel. */
 const LEVELS = [{ length: 4 }, { length: 5 }, { length: 6 }]
+
+const COPY = {
+  es: {
+    won: "Completaste los 3 niveles: secuencias de 4, 5 y 6 colores. ¡Gran memoria!",
+    start: "Pulsa «Empezar» para ver la secuencia.",
+    showing: "Mira la secuencia…",
+    turn: (done: number, total: number) => `Tu turno: ${done} / ${total}`,
+    failed: "Te has equivocado. Inténtalo de nuevo.",
+    levelUp: (n: number) => `¡Nivel ${n} superado!`,
+    allDone: "¡Completaste los 3 niveles!",
+    level: (n: number, total: number, colors: number) =>
+      `Nivel ${n} de ${total} · ${colors} colores`,
+    pads: "Botones de Simón",
+    next: (colors: number) => `Siguiente reto: una secuencia de ${colors} colores.`,
+    continueTo: (n: number, total: number) => `Continuar con el nivel ${n}/${total}`,
+    retry: "Reintentar nivel",
+  },
+  en: {
+    won: "You completed all 3 levels: sequences of 4, 5 and 6 colors. Great memory!",
+    start: "Press “Start” to see the sequence.",
+    showing: "Watch the sequence…",
+    turn: (done: number, total: number) => `Your turn: ${done} / ${total}`,
+    failed: "You slipped. Try again.",
+    levelUp: (n: number) => `Level ${n} cleared!`,
+    allDone: "You completed all 3 levels!",
+    level: (n: number, total: number, colors: number) =>
+      `Level ${n} of ${total} · ${colors} colors`,
+    pads: "Simon buttons",
+    next: (colors: number) => `Next challenge: a sequence of ${colors} colors.`,
+    continueTo: (n: number, total: number) => `Continue to level ${n}/${total}`,
+    retry: "Retry level",
+  },
+}
 
 const STEP_MS = 650
 const LIT_MS = 400
@@ -38,6 +73,9 @@ function buildSequence(length: number) {
 }
 
 export function SimonGame({ onWin, onSwapGame }: GameProps) {
+  const { lang } = useLang()
+  const c = COPY[lang]
+  const ui = useUi()
   const [level, setLevel] = useState(0)
   const [sequence, setSequence] = useState<number[]>([])
   const [phase, setPhase] = useState<Phase>("idle")
@@ -108,24 +146,24 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
     } else {
       setPhase("won")
       onWin?.({
-        solutionText: "Completaste los 3 niveles: secuencias de 4, 5 y 6 colores. ¡Gran memoria!",
+        solutionText: c.won,
       })
     }
   }
 
   const { length } = LEVELS[level]!
 
-  let status = "Pulsa «Empezar» para ver la secuencia."
-  if (phase === "showing") status = "Mira la secuencia…"
-  if (phase === "input") status = `Tu turno: ${inputIdx} / ${sequence.length}`
-  if (phase === "failed") status = "Te has equivocado. Inténtalo de nuevo."
-  if (phase === "levelUp") status = `¡Nivel ${level + 1} superado!`
-  if (phase === "won") status = "¡Completaste los 3 niveles!"
+  let status = c.start
+  if (phase === "showing") status = c.showing
+  if (phase === "input") status = c.turn(inputIdx, sequence.length)
+  if (phase === "failed") status = c.failed
+  if (phase === "levelUp") status = c.levelUp(level + 1)
+  if (phase === "won") status = c.allDone
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-3">
       <p className="text-center text-base font-medium sm:text-lg">
-        Nivel {level + 1} de {LEVELS.length} · {length} colores
+        {c.level(level + 1, LEVELS.length, length)}
       </p>
       <p
         className={cn(
@@ -145,13 +183,13 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
       <div
         className="mx-auto grid w-full max-w-sm grid-cols-2 gap-2 sm:max-w-md sm:gap-3"
         role="group"
-        aria-label="Botones de Simón"
+        aria-label={c.pads}
       >
         {PADS.map((p, i) => (
           <button
-            key={p.label}
+            key={p.label.es}
             type="button"
-            aria-label={p.label}
+            aria-label={p.label[lang]}
             disabled={phase !== "input"}
             onClick={() => onPad(i)}
             className={cn(
@@ -171,7 +209,7 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
           disabled={phase === "idle"}
           onClick={restart}
         >
-          Reiniciar
+          {ui.playback.reset}
         </Button>
         {phase === "won" ? (
           <Button
@@ -180,7 +218,7 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
             disabled={!onSwapGame}
             onClick={onSwapGame}
           >
-            Jugar a otro
+            {ui.playAnother}
           </Button>
         ) : (
           <Button
@@ -189,7 +227,7 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
             disabled={phase !== "idle" && phase !== "failed"}
             onClick={() => playLevel(phase === "idle" ? 0 : level)}
           >
-            {phase === "idle" ? "Empezar" : "Reintentar nivel"}
+            {phase === "idle" ? ui.playback.start : c.retry}
           </Button>
         )}
       </div>
@@ -202,10 +240,9 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle>¡Nivel {level + 1} superado!</DialogTitle>
+            <DialogTitle>{c.levelUp(level + 1)}</DialogTitle>
             <DialogDescription>
-              Siguiente reto: una secuencia de {LEVELS[level + 1]?.length ?? length}{" "}
-              colores.
+              {c.next(LEVELS[level + 1]?.length ?? length)}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-2 pt-2">
@@ -214,7 +251,7 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
               className={BTN}
               onClick={() => playLevel(level + 1)}
             >
-              Continuar con el nivel {level + 2}/{LEVELS.length}
+              {c.continueTo(level + 2, LEVELS.length)}
             </Button>
             <div className="flex flex-row gap-2">
               <Button
@@ -223,7 +260,7 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
                 className={ROW_BTN}
                 onClick={restart}
               >
-                Reiniciar
+                {ui.playback.reset}
               </Button>
               {onSwapGame ? (
                 <Button
@@ -232,7 +269,7 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
                   className={ROW_BTN}
                   onClick={onSwapGame}
                 >
-                  Jugar a otro
+                  {ui.playAnother}
                 </Button>
               ) : null}
             </div>

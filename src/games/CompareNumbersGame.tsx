@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { GameProps } from "@/games/types";
+import { useLang } from "@/lib/language";
 import { useStableRandom } from "@/hooks/use-stable-random";
 import { shuffle } from "@/lib/shuffle";
 import { cn } from "@/lib/utils";
@@ -238,7 +239,22 @@ function buildPuzzle(): ComparePuzzle {
   };
 }
 
+const COPY = {
+  es: {
+    correct: (max: number, a: number, b: number) =>
+      `Correcto: ${max} es la mayor (las otras dan ${a} y ${b}).`,
+    wrong: "Repasa el cálculo y elige otra vez.",
+  },
+  en: {
+    correct: (max: number, a: number, b: number) =>
+      `Correct: ${max} is the biggest (the others give ${a} and ${b}).`,
+    wrong: "Check your math and choose again.",
+  },
+};
+
 export function CompareNumbersGame({ onWin }: GameProps) {
+  const { lang } = useLang();
+  const c = COPY[lang];
   const puzzle = useStableRandom(() => buildPuzzle());
 
   const [wrong, setWrong] = useState(false);
@@ -259,7 +275,7 @@ export function CompareNumbersGame({ onWin }: GameProps) {
         (a, b) => b - a,
       );
       onWin?.({
-        solutionText: `Correcto: ${maxV} es la mayor (las otras dan ${sorted[1]} y ${sorted[2]}).`,
+        solutionText: c.correct(maxV, sorted[1]!, sorted[2]!),
       });
     } else {
       setWrong(true);
@@ -323,7 +339,7 @@ export function CompareNumbersGame({ onWin }: GameProps) {
         className={`text-destructive text-center text-sm ${wrong ? "" : "invisible"}`}
         role="status"
       >
-        Repasa el cálculo y elige otra vez.
+        {c.wrong}
       </p>
     </div>
   );

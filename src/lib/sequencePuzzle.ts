@@ -1,3 +1,5 @@
+import type { Lang } from "@/lib/language"
+
 /** Generadores de series con reglas distintas (no solo progresión aritmética). */
 
 function randomInt(min: number, max: number) {
@@ -8,7 +10,7 @@ export type SequencePuzzle = {
   shown: number[]
   answer: number
   /** Texto breve para el modal de victoria */
-  explain: string
+  explain: Record<Lang, string>
 }
 
 function arithmetic(): SequencePuzzle {
@@ -24,7 +26,10 @@ function arithmetic(): SequencePuzzle {
   return {
     shown,
     answer,
-    explain: `Progresión aritmética (mismo salto cada vez). Serie: ${terms.join(", ")}.`,
+    explain: {
+      es: `Progresión aritmética (mismo salto cada vez). Serie: ${terms.join(", ")}.`,
+      en: `Arithmetic progression (same step each time). Series: ${terms.join(", ")}.`,
+    },
   }
 }
 
@@ -42,7 +47,10 @@ function quadratic(): SequencePuzzle {
   return {
     shown: terms.slice(0, -1),
     answer,
-    explain: `Patrón cuadrático. Serie completa: ${terms.join(", ")}.`,
+    explain: {
+      es: `Patrón cuadrático. Serie completa: ${terms.join(", ")}.`,
+      en: `Quadratic pattern. Full series: ${terms.join(", ")}.`,
+    },
   }
 }
 
@@ -57,7 +65,10 @@ function fibonacciLike(): SequencePuzzle {
   return {
     shown: terms.slice(0, -1),
     answer,
-    explain: `Cada término es la suma de los dos anteriores. Serie: ${terms.join(", ")}.`,
+    explain: {
+      es: `Cada término es la suma de los dos anteriores. Serie: ${terms.join(", ")}.`,
+      en: `Each term is the sum of the previous two. Series: ${terms.join(", ")}.`,
+    },
   }
 }
 
@@ -75,7 +86,10 @@ function geometric(): SequencePuzzle {
   return {
     shown: terms.slice(0, -1),
     answer,
-    explain: `Multiplicación repetida por ${r}. Serie: ${terms.join(", ")}.`,
+    explain: {
+      es: `Multiplicación repetida por ${r}. Serie: ${terms.join(", ")}.`,
+      en: `Repeated multiplication by ${r}. Series: ${terms.join(", ")}.`,
+    },
   }
 }
 
@@ -95,7 +109,10 @@ function alternatingStep(): SequencePuzzle {
   return {
     shown: terms.slice(0, -1),
     answer,
-    explain: `Los saltos alternan (+${d1} y ${d2}). Serie: ${terms.join(", ")}.`,
+    explain: {
+      es: `Los saltos alternan (+${d1} y ${d2}). Serie: ${terms.join(", ")}.`,
+      en: `The steps alternate (+${d1} and ${d2}). Series: ${terms.join(", ")}.`,
+    },
   }
 }
 
@@ -122,7 +139,10 @@ function cyclicThreeStep(): SequencePuzzle {
   return {
     shown: terms.slice(0, -1),
     answer,
-    explain: `Los saltos se repiten en ciclo (+${d0}, +${d1}, +${d2}). Serie: ${terms.join(", ")}.`,
+    explain: {
+      es: `Los saltos se repiten en ciclo (+${d0}, +${d1}, +${d2}). Serie: ${terms.join(", ")}.`,
+      en: `The steps repeat in a cycle (+${d0}, +${d1}, +${d2}). Series: ${terms.join(", ")}.`,
+    },
   }
 }
 
@@ -142,7 +162,10 @@ function addThenMul(): SequencePuzzle {
   return {
     shown: terms.slice(0, -1),
     answer,
-    explain: `Alterna sumar ${k} y multiplicar por ${r}. Serie: ${terms.join(", ")}.`,
+    explain: {
+      es: `Alterna sumar ${k} y multiplicar por ${r}. Serie: ${terms.join(", ")}.`,
+      en: `Alternates adding ${k} and multiplying by ${r}. Series: ${terms.join(", ")}.`,
+    },
   }
 }
 

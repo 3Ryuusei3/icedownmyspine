@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import type { GameProps } from "@/games/types"
+import { useLang } from "@/lib/language"
 import { useStableRandom } from "@/hooks/use-stable-random"
 import { shuffle } from "@/lib/shuffle"
 
@@ -31,6 +32,21 @@ const EMOJI_POOL = [
   "🌻",
 ]
 
+const COPY = {
+  es: {
+    won: "Encontraste las 8 parejas. ¡Buena memoria!",
+    cards: "Cartas de memoria",
+    found: (e: string) => `Pareja encontrada: ${e}`,
+    down: "Carta boca abajo",
+  },
+  en: {
+    won: "You found all 8 pairs. Great memory!",
+    cards: "Memory cards",
+    found: (e: string) => `Pair found: ${e}`,
+    down: "Face-down card",
+  },
+}
+
 type Card = { emoji: string; key: string }
 
 function buildDeck(): Card[] {
@@ -43,6 +59,8 @@ function buildDeck(): Card[] {
 }
 
 export function MemoryPairsGame({ onWin }: GameProps) {
+  const { lang } = useLang()
+  const c = COPY[lang]
   const deck = useStableRandom(() => buildDeck())
 
   const [flipped, setFlipped] = useState<number[]>([])
@@ -62,7 +80,7 @@ export function MemoryPairsGame({ onWin }: GameProps) {
     if (nextMatched.size === 16) {
       clearFlipTimeout()
       onWin?.({
-        solutionText: "Encontraste las 8 parejas. ¡Buena memoria!",
+        solutionText: c.won,
       })
     }
   }
@@ -105,7 +123,7 @@ export function MemoryPairsGame({ onWin }: GameProps) {
       <div
         className="mx-auto grid w-full max-w-sm grid-cols-4 gap-1.5 sm:max-w-md sm:gap-3"
         role="grid"
-        aria-label="Cartas de memoria"
+        aria-label={c.cards}
       >
         {deck.map((card, i) => {
           const isUp = flipped.includes(i) || matched.has(i)
@@ -116,10 +134,10 @@ export function MemoryPairsGame({ onWin }: GameProps) {
               role="gridcell"
               aria-label={
                 matched.has(i)
-                  ? `Pareja encontrada: ${card.emoji}`
+                  ? c.found(card.emoji)
                   : isUp
                     ? card.emoji
-                    : "Carta boca abajo"
+                    : c.down
               }
               disabled={matched.has(i)}
               onClick={() => onCardClick(i)}

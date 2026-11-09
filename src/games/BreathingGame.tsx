@@ -1,6 +1,7 @@
 import { Minus, Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useLang } from "@/lib/language"
 import {
   PlaybackControls,
   type PlaybackStatus,
@@ -10,7 +11,6 @@ type Phase = "idle" | "inhale" | "hold" | "exhale" | "done"
 
 type Setting = {
   key: "inhale" | "hold" | "exhale" | "cycles"
-  label: string
   min: number
   max: number
   unit: string
@@ -20,21 +20,48 @@ type Setting = {
 const DEFAULTS = { inhale: 4, hold: 4, exhale: 6, cycles: 5 }
 
 const SETTINGS: Setting[] = [
-  { key: "inhale", label: "Inhalar", min: 2, max: 8, unit: "s" },
-  { key: "hold", label: "Mantener", min: 0, max: 8, unit: "s" },
-  { key: "exhale", label: "Exhalar", min: 2, max: 10, unit: "s" },
-  { key: "cycles", label: "Respiraciones", min: 3, max: 10, unit: "" },
+  { key: "inhale", min: 2, max: 8, unit: "s" },
+  { key: "hold", min: 0, max: 8, unit: "s" },
+  { key: "exhale", min: 2, max: 10, unit: "s" },
+  { key: "cycles", min: 3, max: 10, unit: "" },
 ]
 
-type Config = typeof DEFAULTS
-
-const LABELS: Record<Phase, string> = {
-  idle: "",
-  inhale: "Inhala",
-  hold: "Sostén",
-  exhale: "Exhala",
-  done: "Bien hecho",
+const COPY = {
+  es: {
+    labels: {
+      inhale: "Inhalar",
+      hold: "Mantener",
+      exhale: "Exhalar",
+      cycles: "Respiraciones",
+    },
+    phases: { idle: "", inhale: "Inhala", hold: "Sostén", exhale: "Exhala", done: "Bien hecho" },
+    adjust: "Ajusta la respiración y pulsa «Empezar».",
+    paused: (n: number, total: number) => `En pausa · respiración ${n} de ${total}`,
+    breath: (n: number, total: number) => `Respiración ${n} de ${total}`,
+    done: (total: number) => `Has completado las ${total} respiraciones.`,
+    less: (label: string) => `Menos ${label.toLowerCase()}`,
+    more: (label: string) => `Más ${label.toLowerCase()}`,
+    no: "No",
+  },
+  en: {
+    labels: {
+      inhale: "Inhale",
+      hold: "Hold",
+      exhale: "Exhale",
+      cycles: "Breaths",
+    },
+    phases: { idle: "", inhale: "Breathe in", hold: "Hold", exhale: "Breathe out", done: "Well done" },
+    adjust: "Adjust your breathing and press “Start”.",
+    paused: (n: number, total: number) => `Paused · breath ${n} of ${total}`,
+    breath: (n: number, total: number) => `Breath ${n} of ${total}`,
+    done: (total: number) => `You completed all ${total} breaths.`,
+    less: (label: string) => `Less ${label.toLowerCase()}`,
+    more: (label: string) => `More ${label.toLowerCase()}`,
+    no: "No",
+  },
 }
+
+type Config = typeof DEFAULTS
 
 /** Radio del círculo (sobre 50) cuando está encogido y expandido. */
 const R_MIN = 28
@@ -73,6 +100,9 @@ function stateAt(sec: number, c: Config) {
 }
 
 export function BreathingGame() {
+  const { lang } = useLang()
+  const c = COPY[lang]
+  const LABELS = c.phases
   const [config, setConfig] = useState<Config>(DEFAULTS)
   const [status, setStatus] = useState<PlaybackStatus>("idle")
   const [elapsed, setElapsed] = useState(0) // segundos
@@ -138,14 +168,14 @@ export function BreathingGame() {
   const phase: Phase = current?.phase ?? (status === "done" ? "done" : "idle")
   const radius = current?.radius ?? R_MIN
 
-  let statusText = "Ajusta la respiración y pulsa «Empezar»."
+  let statusText = c.adjust
   if (current) {
     statusText =
       status === "paused"
-        ? `En pausa · respiración ${current.cycle} de ${config.cycles}`
-        : `Respiración ${current.cycle} de ${config.cycles}`
+        ? c.paused(current.cycle, config.cycles)
+        : c.breath(current.cycle, config.cycles)
   }
-  if (status === "done") statusText = `Has completado las ${config.cycles} respiraciones.`
+  if (status === "done") statusText = c.done(config.cycles)
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-3">
@@ -195,28 +225,28 @@ export function BreathingGame() {
           const value = config[s.key]
           return (
             <div key={s.key} className="flex flex-col items-center gap-1">
-              <span className="text-muted-foreground text-xs">{s.label}</span>
+              <span className="text-muted-foreground text-xs">{c.labels[s.key]}</span>
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
                   className="size-8"
-                  aria-label={`Menos ${s.label.toLowerCase()}`}
+                  aria-label={c.less(c.labels[s.key])}
                   disabled={active || value <= s.min}
                   onClick={() => change(s.key, -1, s.min, s.max)}
                 >
                   <Minus aria-hidden className="size-4" />
                 </Button>
                 <span className="min-w-12 text-center text-sm font-medium tabular-nums">
-                  {s.key === "hold" && value === 0 ? "No" : `${value}${s.unit}`}
+                  {s.key === "hold" && value === 0 ? c.no : `${value}${s.unit}`}
                 </span>
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
                   className="size-8"
-                  aria-label={`Más ${s.label.toLowerCase()}`}
+                  aria-label={c.more(c.labels[s.key])}
                   disabled={active || value >= s.max}
                   onClick={() => change(s.key, 1, s.min, s.max)}
                 >

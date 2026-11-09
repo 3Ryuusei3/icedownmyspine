@@ -8,9 +8,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { useUi } from "@/i18n/use-ui"
+import { useLang } from "@/lib/language"
 import {
-  CATEGORY_LABELS,
   GAMES,
+  isAvailable,
   type GameCategory,
   type GameId,
 } from "@/lib/gameRegistry"
@@ -25,6 +27,8 @@ const CATEGORIES: GameCategory[] = ["game", "relax"]
 
 export function GamePicker({ currentId, onSelect }: GamePickerProps) {
   const [open, setOpen] = useState(false)
+  const ui = useUi()
+  const { lang } = useLang()
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -34,7 +38,7 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
           variant="outline"
           size="icon-lg"
           className="size-9 min-h-9 min-w-9 shrink-0 sm:size-11 sm:min-h-11 sm:min-w-11"
-          aria-label="Elegir minijuego"
+          aria-label={ui.picker.aria}
         >
           <LayoutGrid className="size-4 sm:size-5" aria-hidden />
         </Button>
@@ -44,18 +48,18 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
         showCloseButton
       >
         <DialogHeader>
-          <DialogTitle>Minijuegos</DialogTitle>
-          <DialogDescription>
-            Elige uno; se cargará una partida nueva.
-          </DialogDescription>
+          <DialogTitle>{ui.picker.title}</DialogTitle>
+          <DialogDescription>{ui.picker.description}</DialogDescription>
         </DialogHeader>
         {CATEGORIES.map((category) => (
           <section key={category} className="flex flex-col gap-2">
             <h3 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-              {CATEGORY_LABELS[category]}
+              {ui.categories[category]}
             </h3>
             <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
-              {GAMES.filter((g) => g.category === category).map((g) => (
+              {GAMES.filter(
+                (g) => g.category === category && isAvailable(g, lang),
+              ).map((g) => (
                 <Button
                   key={g.id}
                   type="button"
@@ -66,10 +70,10 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
                     setOpen(false)
                   }}
                 >
-                  <span>{g.title}</span>
+                  <span>{g.text[lang].title}</span>
                   {g.id === currentId ? (
                     <span className="text-muted-foreground text-xs font-normal">
-                      Actual
+                      {ui.picker.current}
                     </span>
                   ) : null}
                 </Button>

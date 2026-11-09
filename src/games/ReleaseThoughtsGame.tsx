@@ -1,8 +1,30 @@
 import { useState, type AnimationEvent, type CSSProperties } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useLang } from "@/lib/language"
 
 const MAX_LENGTH = 100
+
+const COPY = {
+  es: {
+    start: "Escribe algo que te ronde la cabeza. No se guarda.",
+    letGo: "Déjalo ir…",
+    released: (n: number) =>
+      `Has soltado ${n} ${n === 1 ? "pensamiento" : "pensamientos"}. Puedes soltar otro.`,
+    placeholder: "Lo que me preocupa…",
+    aria: "Pensamiento que quieres soltar",
+    release: "Soltar",
+  },
+  en: {
+    start: "Write something that's on your mind. Nothing is saved.",
+    letGo: "Let it go…",
+    released: (n: number) =>
+      `You've released ${n} ${n === 1 ? "thought" : "thoughts"}. You can release another.`,
+    placeholder: "What's worrying me…",
+    aria: "Thought you want to release",
+    release: "Release",
+  },
+}
 
 /** Rayitos del «pop»: diez destellos que salen en abanico desde el centro. */
 const POP_RAYS = Array.from({ length: 10 }, (_, i) => ({
@@ -10,6 +32,8 @@ const POP_RAYS = Array.from({ length: 10 }, (_, i) => ({
 }) as CSSProperties)
 
 export function ReleaseThoughtsGame() {
+  const { lang } = useLang()
+  const c = COPY[lang]
   const [text, setText] = useState("")
   const [floating, setFloating] = useState<{ id: number; text: string } | null>(
     null,
@@ -39,10 +63,10 @@ export function ReleaseThoughtsGame() {
     setPopping(false)
   }
 
-  let status = "Escribe algo que te ronde la cabeza. No se guarda."
-  if (busy) status = "Déjalo ir…"
+  let status = c.start
+  if (busy) status = c.letGo
   else if (released > 0)
-    status = `Has soltado ${released} ${released === 1 ? "pensamiento" : "pensamientos"}. Puedes soltar otro.`
+    status = c.released(released)
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-3">
@@ -91,8 +115,8 @@ export function ReleaseThoughtsGame() {
         value={text}
         maxLength={MAX_LENGTH}
         autoComplete="off"
-        placeholder="Lo que me preocupa…"
-        aria-label="Pensamiento que quieres soltar"
+        placeholder={c.placeholder}
+        aria-label={c.aria}
         className="h-10 sm:h-11"
         disabled={busy}
         onChange={(e) => setText(e.target.value)}
@@ -107,7 +131,7 @@ export function ReleaseThoughtsGame() {
         disabled={!canRelease}
         onClick={release}
       >
-        Soltar
+        {c.release}
       </Button>
     </div>
   )

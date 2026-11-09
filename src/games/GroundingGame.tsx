@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import type { GameProps } from "@/games/types"
+import { useLang } from "@/lib/language"
 
 const STEPS = [
   {
@@ -17,43 +18,88 @@ const STEPS = [
       "Veo…",
       "Veo…",
     ],
+    en: {
+      title: "5 things you see",
+      hint: "Look around you and name them quietly or write them down.",
+      placeholders: ["I see…", "I see…", "I see…", "I see…", "I see…"],
+    },
   },
   {
     count: 4,
     title: "4 cosas que oyes",
     hint: "Pueden ser lejanas o suaves: el aire, un pájaro, el tráfico…",
     placeholders: ["Oigo…", "Oigo…", "Oigo…", "Oigo…"],
+    en: {
+      title: "4 things you hear",
+      hint: "They can be distant or soft: the air, a bird, traffic…",
+      placeholders: ["I hear…", "I hear…", "I hear…", "I hear…"],
+    },
   },
   {
     count: 3,
     title: "3 cosas que sientes al tacto",
     hint: "La ropa, el suelo bajo los pies, un objeto cerca de ti…",
     placeholders: ["Siento…", "Siento…", "Siento…"],
+    en: {
+      title: "3 things you feel by touch",
+      hint: "Your clothes, the floor under your feet, an object near you…",
+      placeholders: ["I feel…", "I feel…", "I feel…"],
+    },
   },
   {
     count: 2,
     title: "2 cosas que hueles",
     hint: "Si no percibes olor, puedes imaginar uno agradable.",
     placeholders: ["Huelo…", "Huelo…"],
+    en: {
+      title: "2 things you smell",
+      hint: "If you can't smell anything, you can imagine a pleasant scent.",
+      placeholders: ["I smell…", "I smell…"],
+    },
   },
   {
     count: 1,
     title: "1 cosa que saboreas",
     hint: "Un sorbo de agua, el sabor residual en la boca…",
     placeholders: ["Saboreo…"],
+    en: {
+      title: "1 thing you taste",
+      hint: "A sip of water, the lingering taste in your mouth…",
+      placeholders: ["I taste…"],
+    },
   },
 ] as const
+
+const COPY = {
+  es: {
+    finished:
+      "Has completado el recorrido 5-4-3-2-1. Estás aquí, en el presente. Puedes quedarte un momento respirando despacio o repetir el ejercicio si te ayuda.",
+    repeat: "Repetir grounding",
+    next: "Siguiente",
+    finish: "Terminar",
+  },
+  en: {
+    finished:
+      "You've completed the 5-4-3-2-1 exercise. You're here, in the present. You can stay a moment breathing slowly or repeat the exercise if it helps.",
+    repeat: "Repeat grounding",
+    next: "Next",
+    finish: "Finish",
+  },
+}
 
 /** Props del registro; no usamos `onWin` para no tapar la pantalla final. */
 export function GroundingGame(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- interfaz común con el resto de juegos
   _props: GameProps,
 ) {
+  const { lang } = useLang()
+  const c = COPY[lang]
   const [stepIndex, setStepIndex] = useState(0)
   const [values, setValues] = useState<Record<string, string>>({})
   const [done, setDone] = useState(false)
 
-  const step = STEPS[stepIndex]!
+  const base = STEPS[stepIndex]!
+  const step = lang === "en" ? base.en : base
   const progress = done ? 100 : (stepIndex / STEPS.length) * 100
 
   function fieldId(i: number) {
@@ -73,9 +119,7 @@ export function GroundingGame(
       <div className="flex flex-col gap-4 max-sm:gap-2 text-center">
         <Progress value={100} className="h-2" />
         <p className="text-muted-foreground max-sm:text-xs max-sm:leading-snug text-sm leading-relaxed">
-          Has completado el recorrido 5-4-3-2-1. Estás aquí, en el presente.
-          Puedes quedarte un momento respirando despacio o repetir el ejercicio
-          si te ayuda.
+          {c.finished}
         </p>
         <Button
           type="button"
@@ -87,7 +131,7 @@ export function GroundingGame(
             setDone(false)
           }}
         >
-          Repetir grounding
+          {c.repeat}
         </Button>
       </div>
     )
@@ -125,7 +169,7 @@ export function GroundingGame(
         ))}
       </div>
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={next}>
-        {stepIndex < STEPS.length - 1 ? "Siguiente" : "Terminar"}
+        {stepIndex < STEPS.length - 1 ? c.next : c.finish}
       </Button>
     </div>
   )

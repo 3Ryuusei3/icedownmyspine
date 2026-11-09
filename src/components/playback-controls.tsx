@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { useUi } from "@/i18n/use-ui"
 
 export type PlaybackStatus = "idle" | "playing" | "paused" | "done"
 
@@ -23,6 +24,7 @@ export function PlaybackControls({
   onPause,
   onReset,
 }: PlaybackControlsProps) {
+  const ui = useUi().playback
   const playing = status === "playing"
   return (
     <div className="flex flex-row gap-2">
@@ -33,10 +35,10 @@ export function PlaybackControls({
         disabled={status === "idle"}
         onClick={onReset}
       >
-        Reiniciar
+        {ui.reset}
       </Button>
       <Button type="button" className={BTN} onClick={playing ? onPause : onPlay}>
-        {playing ? "Pausar" : status === "paused" ? "Continuar" : "Empezar"}
+        {playing ? ui.pause : status === "paused" ? ui.resume : ui.start}
       </Button>
     </div>
   )

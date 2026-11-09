@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { GameProps } from "@/games/types";
+import { useLang } from "@/lib/language";
 import { useStableRandom } from "@/hooks/use-stable-random";
 import { shuffle } from "@/lib/shuffle";
 
@@ -29,7 +30,32 @@ function buildOrderRound(): OrderRound {
   };
 }
 
+const COPY = {
+  es: {
+    solution: (start: number, end: number, count: number) =>
+      `Orden correcto: del ${start} al ${end} (${count} números) sin fallar en esta disposición.`,
+    grid: (start: number, end: number) => `Cuadrícula del ${start} al ${end}`,
+    cell: (n: number, done: boolean) =>
+      `Número ${n}${done ? ", ya acertado" : ""}`,
+    wrong: (start: number) => `Orden incorrecto — empieza otra vez por el ${start}.`,
+    from: "En esta partida: del",
+    to: "al",
+  },
+  en: {
+    solution: (start: number, end: number, count: number) =>
+      `Correct order: from ${start} to ${end} (${count} numbers) with no mistakes in this layout.`,
+    grid: (start: number, end: number) => `Grid from ${start} to ${end}`,
+    cell: (n: number, done: boolean) =>
+      `Number ${n}${done ? ", already done" : ""}`,
+    wrong: (start: number) => `Wrong order — start again from ${start}.`,
+    from: "This round: from",
+    to: "to",
+  },
+};
+
 export function OrderTapGame({ onWin }: GameProps) {
+  const { lang } = useLang();
+  const c = COPY[lang];
   const round = useStableRandom(() => buildOrderRound());
 
   const [nextExpected, setNextExpected] = useState(round.start);
@@ -55,7 +81,7 @@ export function OrderTapGame({ onWin }: GameProps) {
       if (n === round.end) {
         setCompleted(new Set(round.numbers));
         onWin?.({
-          solutionText: `Orden correcto: del ${round.start} al ${round.end} (${COUNT} números) sin fallar en esta disposición.`,
+          solutionText: c.solution(round.start, round.end, COUNT),
         });
       } else {
         setCompleted((prev) => new Set([...prev, n]));
@@ -74,19 +100,19 @@ export function OrderTapGame({ onWin }: GameProps) {
       }, 450);
     }
   }
-  const gridLabel = `Cuadrícula del ${round.start} al ${round.end}`;
+  const gridLabel = c.grid(round.start, round.end);
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
       <p className="text-center text-base font-medium tabular-nums sm:text-lg">
-        En esta partida: del <span className="text-foreground">{round.start}</span>{" "}
-        al <span className="text-foreground">{round.end}</span>
+        {c.from} <span className="text-foreground">{round.start}</span>{" "}
+        {c.to} <span className="text-foreground">{round.end}</span>
       </p>
       <p
         className={`text-destructive text-center text-sm font-medium ${wrongFlash ? "animate-pulse" : "invisible"}`}
         aria-live="polite"
       >
-        Orden incorrecto — empieza otra vez por el {round.start}.
+        {c.wrong(round.start)}
       </p>
       <div
         className="mx-auto grid w-full max-w-sm grid-cols-5 gap-1.5 sm:max-w-md sm:gap-2.5"
@@ -100,7 +126,7 @@ export function OrderTapGame({ onWin }: GameProps) {
               key={`${i}-${n}`}
               type="button"
               role="gridcell"
-              aria-label={`Número ${n}${isDone ? ", ya acertado" : ""}`}
+              aria-label={c.cell(n, isDone)}
               onClick={() => onCell(n)}
               className={cn(
                 "border-border flex aspect-square min-h-10 items-center justify-center rounded-lg border-2 text-sm font-semibold tabular-nums transition-colors active:scale-[0.98] sm:min-h-14 sm:text-lg",

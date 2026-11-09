@@ -19,12 +19,21 @@ import {
 } from "@/components/ui/dialog";
 import type { WinPayload } from "@/games/types";
 import { useRotation } from "@/hooks/use-rotation";
-import { getGameById, pickRandomGame, type GameId } from "@/lib/gameRegistry";
+import { useUi } from "@/i18n/use-ui";
+import { useLang, type Lang } from "@/lib/language";
+import {
+  getGameById,
+  isAvailable,
+  pickRandomGame,
+  type GameId,
+} from "@/lib/gameRegistry";
 
 export function Home() {
+  const { lang, setLang } = useLang();
+  const ui = useUi();
   const { enabled, setEnabled } = useRotation();
   // eslint-disable-next-line react-hooks/exhaustive-deps -- solo la partida inicial
-  const initial = useMemo(() => pickRandomGame(undefined, enabled), []);
+  const initial = useMemo(() => pickRandomGame(undefined, enabled, lang), []);
   const [gameId, setGameId] = useState<GameId>(initial.id);
   const [session, setSession] = useState(0);
   const [replayNonce, setReplayNonce] = useState(0);
@@ -33,16 +42,29 @@ export function Home() {
 
   const game = getGameById(gameId);
   const GameComponent = game.component;
+  const gameText = game.text[lang];
 
   useEffect(() => {
-    document.title = "Hielo por la espalda";
-  }, []);
+    document.title = ui.documentTitle;
+  }, [ui.documentTitle]);
+
+  const changeLanguage = useCallback(
+    (next: Lang) => {
+      setLang(next);
+      // Un juego no disponible en el nuevo idioma se cambia por otro.
+      if (!isAvailable(getGameById(gameId), next)) {
+        setGameId(pickRandomGame(undefined, enabled, next).id);
+      }
+      setSession((s) => s + 1);
+    },
+    [setLang, gameId, enabled],
+  );
 
   const swapGame = useCallback(() => {
-    const next = pickRandomGame(gameId, enabled);
+    const next = pickRandomGame(gameId, enabled, lang);
     setGameId(next.id);
     setSession((s) => s + 1);
-  }, [gameId, enabled]);
+  }, [gameId, enabled, lang]);
 
   const selectGameFromMenu = useCallback((id: GameId) => {
     setGameId(id);
@@ -72,10 +94,10 @@ export function Home() {
   const playAnotherGame = useCallback(() => {
     setWinOpen(false);
     setWinSolution(null);
-    const next = pickRandomGame(gameId, enabled);
+    const next = pickRandomGame(gameId, enabled, lang);
     setGameId(next.id);
     setSession((s) => s + 1);
-  }, [gameId, enabled]);
+  }, [gameId, enabled, lang]);
 
   return (
     <div className="bg-background text-foreground flex min-h-svh flex-col">
@@ -94,12 +116,15 @@ export function Home() {
               </h1>
             </div>
             <p className="text-muted-foreground mt-1 max-w-md text-pretty text-xs leading-snug sm:mt-2 sm:text-sm sm:leading-relaxed">
-              Minijuegos sencillos para desviar la atención. No hay puntuación
-              ni prisa.
+              {ui.subtitle}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-            <SettingsDialog enabled={enabled} onChange={setEnabled} />
+            <SettingsDialog
+              enabled={enabled}
+              onChange={setEnabled}
+              onLanguageChange={changeLanguage}
+            />
             <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
             <PalettePicker />
           </div>
@@ -110,10 +135,10 @@ export function Home() {
             <Card className="border-border/60 bg-muted/50 max-sm:gap-2 max-sm:py-3 shrink-0 shadow-sm dark:bg-muted/25 sm:gap-4 sm:py-4">
               <CardHeader className="space-y-1 max-sm:px-3 max-sm:pb-2 pb-4 sm:px-4">
                 <CardTitle className="text-lg sm:text-xl">
-                  {game.title}
+                  {gameText.title}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground max-sm:text-xs max-sm:leading-snug leading-relaxed">
-                  {game.description}
+                  {gameText.description}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -122,7 +147,7 @@ export function Home() {
                 <div className="flex flex-col items-center px-1 py-1 sm:px-2 sm:py-2">
                   <div className="w-full max-w-full">
                     <GameComponent
-                      key={`${gameId}-${session}-${replayNonce}`}
+                      key={`${gameId}-${session}-${replayNonce}-${lang}`}
                       onWin={handleWin}
                       onSwapGame={swapGame}
                     />
@@ -139,17 +164,17 @@ export function Home() {
             variant="secondary"
             className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
             onClick={replayCurrentGame}
-            aria-label="Volver a jugar a este juego"
+            aria-label={ui.repeatGameAria}
           >
-            Repetir juego
+            {ui.repeatGame}
           </Button>
           <Button
             type="button"
             className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
             onClick={swapGame}
-            aria-label="Jugar a otro juego"
+            aria-label={ui.playAnotherAria}
           >
-            Jugar a otro
+            {ui.playAnother}
           </Button>
         </div>
       </div>
@@ -163,10 +188,8 @@ export function Home() {
       >
         <DialogContent className="sm:max-w-md" showCloseButton>
           <DialogHeader>
-            <DialogTitle>¡Muy bien!</DialogTitle>
-            <DialogDescription>
-              Has completado este minijuego. Tómate un respiro si lo necesitas.
-            </DialogDescription>
+            <DialogTitle>{ui.winTitle}</DialogTitle>
+            <DialogDescription>{ui.winDescription}</DialogDescription>
           </DialogHeader>
           {winSolution !== null ? (
             <h3 className="text-balance whitespace-pre-line px-2 text-center text-base leading-snug font-semibold text-emerald-600 sm:text-lg dark:text-emerald-400">
@@ -179,17 +202,17 @@ export function Home() {
               variant="secondary"
               className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
               onClick={replaySameGame}
-              aria-label="Volver a jugar a este juego"
+              aria-label={ui.repeatGameAria}
             >
-              Repetir
+              {ui.repeat}
             </Button>
             <Button
               type="button"
               className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
               onClick={playAnotherGame}
-              aria-label="Jugar a otro juego"
+              aria-label={ui.playAnotherAria}
             >
-              Otro
+              {ui.another}
             </Button>
           </div>
         </DialogContent>

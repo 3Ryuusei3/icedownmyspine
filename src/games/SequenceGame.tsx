@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { NumericKeypad } from "@/components/numeric-keypad"
 import type { GameProps } from "@/games/types"
+import { useLang } from "@/lib/language"
 import { useStableRandom } from "@/hooks/use-stable-random"
 import { buildRandomSequencePuzzle } from "@/lib/sequencePuzzle"
 
@@ -17,7 +18,24 @@ function sanitizeSignedIntegerInput(raw: string): string {
   return leadingMinus ? `-${digits}` : digits
 }
 
+const COPY = {
+  es: {
+    answer: "Tu respuesta",
+    placeholder: "Número",
+    check: "Comprobar",
+    wrong: "Aún no. Respira e inténtalo de nuevo.",
+  },
+  en: {
+    answer: "Your answer",
+    placeholder: "Number",
+    check: "Check",
+    wrong: "Not yet. Breathe and try again.",
+  },
+}
+
 export function SequenceGame({ onWin }: GameProps) {
+  const { lang } = useLang()
+  const c = COPY[lang]
   const puzzle = useStableRandom(() => buildRandomSequencePuzzle())
 
   const [value, setValue] = useState("")
@@ -33,7 +51,7 @@ export function SequenceGame({ onWin }: GameProps) {
     }
     if (n === puzzle.answer) {
       onWin?.({
-        solutionText: puzzle.explain,
+        solutionText: puzzle.explain[lang],
       })
     } else {
       setFeedback("bad")
@@ -69,12 +87,12 @@ export function SequenceGame({ onWin }: GameProps) {
         {sequenceText}
       </p>
       <div className="space-y-2">
-        <Label htmlFor="seq-answer">Tu respuesta</Label>
+        <Label htmlFor="seq-answer">{c.answer}</Label>
         <Input
           id="seq-answer"
           inputMode="none"
           autoComplete="off"
-          placeholder="Número"
+          placeholder={c.placeholder}
           value={value}
           onChange={(e) => {
             setValue(sanitizeSignedIntegerInput(e.target.value))
@@ -96,12 +114,12 @@ export function SequenceGame({ onWin }: GameProps) {
         />
       </div>
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
-        Comprobar
+        {c.check}
       </Button>
       <p
         className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
       >
-        Aún no. Respira e inténtalo de nuevo.
+        {c.wrong}
       </p>
     </div>
   )

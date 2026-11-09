@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NumericKeypad } from "@/components/numeric-keypad";
 import type { GameProps } from "@/games/types";
+import { useLang } from "@/lib/language";
+import { useUi } from "@/i18n/use-ui";
 import { cn } from "@/lib/utils";
 import {
   formatSudoku9Lines,
@@ -21,7 +23,29 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return out;
 }
 
+const COPY = {
+  es: {
+    grid: "Sudoku 9 por 9",
+    cell: (r: number, c: number, v: number) =>
+      `Celda fila ${r} columna ${c}${v === 0 ? ", vacía" : `, valor ${v}`}`,
+    keypadPick: "Teclado numérico: elige una celda vacía para escribir",
+    check: "Comprobar solución",
+    wrong: "Revisa celdas vacías o números repetidos en fila, columna o bloque.",
+  },
+  en: {
+    grid: "Sudoku 9 by 9",
+    cell: (r: number, c: number, v: number) =>
+      `Cell row ${r} column ${c}${v === 0 ? ", empty" : `, value ${v}`}`,
+    keypadPick: "Number keypad: pick an empty cell to type in",
+    check: "Check solution",
+    wrong: "Check for empty cells or repeated numbers in a row, column or block.",
+  },
+};
+
 export function Sudoku9Game({ onWin }: GameProps) {
+  const { lang } = useLang();
+  const c = COPY[lang];
+  const ui = useUi();
   const [{ puzzle, cells }, setPuzzleState] = useState(() => {
     const p = pickSudoku9Puzzle();
     return { puzzle: p, cells: [...p.initial] as number[] };
@@ -92,7 +116,7 @@ export function Sudoku9Game({ onWin }: GameProps) {
         ref={gridRef}
         className="border-border bg-border mx-auto grid w-full max-w-md grid-cols-9 gap-px overflow-hidden rounded-xl border-2 p-0.5 sm:max-w-lg sm:p-1"
         role="grid"
-        aria-label="Sudoku 9 por 9"
+        aria-label={c.grid}
       >
         {rows.map((row, ri) =>
           row.map((val, ci) => {
@@ -119,7 +143,7 @@ export function Sudoku9Game({ onWin }: GameProps) {
                 ) : (
                   <button
                     type="button"
-                    aria-label={`Celda fila ${ri + 1} columna ${ci + 1}${val === 0 ? ", vacía" : `, valor ${val}`}`}
+                    aria-label={c.cell(ri + 1, ci + 1, val)}
                     className="h-full w-full touch-manipulation select-none bg-transparent text-center text-[13px] tabular-nums outline-none sm:text-sm"
                     onMouseDown={(e) => onCellMouseDown(i, e)}
                   >
@@ -138,8 +162,8 @@ export function Sudoku9Game({ onWin }: GameProps) {
         onBackspace={onKeypadBackspace}
         ariaLabel={
           activeCell === null
-            ? "Teclado numérico: elige una celda vacía para escribir"
-            : "Teclado numérico"
+            ? c.keypadPick
+            : ui.keypad.numeric
         }
       />
       <Button
@@ -147,12 +171,12 @@ export function Sudoku9Game({ onWin }: GameProps) {
         className="min-h-10 w-full sm:min-h-11"
         onClick={check}
       >
-        Comprobar solución
+        {c.check}
       </Button>
       <p
         className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
       >
-        Revisa celdas vacías o números repetidos en fila, columna o bloque.
+        {c.wrong}
       </p>
     </div>
   );

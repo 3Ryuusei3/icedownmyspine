@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { NumericKeypad } from "@/components/numeric-keypad"
 import type { GameProps } from "@/games/types"
+import { useLang } from "@/lib/language"
 
 type MathQuickFilter = "all" | "mul" | "div"
 
@@ -11,6 +12,29 @@ type MathPuzzle = { prompt: string; answer: number }
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+const COPY = {
+  es: {
+    all: "Todo",
+    mul: "Solo multiplicaciones",
+    div: "Solo divisiones",
+    group: "Tipo de operaciones",
+    result: "Resultado",
+    placeholder: "Número",
+    check: "Comprobar",
+    wrong: "No coincide. Puedes volver a calcular con calma.",
+  },
+  en: {
+    all: "All",
+    mul: "Multiplications only",
+    div: "Divisions only",
+    group: "Type of operations",
+    result: "Result",
+    placeholder: "Number",
+    check: "Check",
+    wrong: "That doesn't match. You can work it out again, calmly.",
+  },
 }
 
 const DIVISORS = [3, 4, 5] as const
@@ -73,6 +97,8 @@ function buildMathPuzzle(filter: MathQuickFilter): MathPuzzle {
 }
 
 export function MathQuickGame({ onWin }: GameProps) {
+  const { lang } = useLang()
+  const c = COPY[lang]
   const [filter, setFilter] = useState<MathQuickFilter>(readStoredFilter)
   const puzzle = useMemo(() => buildMathPuzzle(filter), [filter])
 
@@ -119,7 +145,7 @@ export function MathQuickGame({ onWin }: GameProps) {
       <div
         className="flex flex-wrap justify-center gap-2"
         role="group"
-        aria-label="Tipo de operaciones"
+        aria-label={c.group}
       >
         <Button
           type="button"
@@ -128,7 +154,7 @@ export function MathQuickGame({ onWin }: GameProps) {
           className="min-h-9"
           onClick={() => setFilterAndPersist("all")}
         >
-          Todo
+          {c.all}
         </Button>
         <Button
           type="button"
@@ -137,7 +163,7 @@ export function MathQuickGame({ onWin }: GameProps) {
           className="min-h-9"
           onClick={() => setFilterAndPersist("mul")}
         >
-          Solo multiplicaciones
+          {c.mul}
         </Button>
         <Button
           type="button"
@@ -146,7 +172,7 @@ export function MathQuickGame({ onWin }: GameProps) {
           className="min-h-9"
           onClick={() => setFilterAndPersist("div")}
         >
-          Solo divisiones
+          {c.div}
         </Button>
       </div>
       <p className="text-center text-xl font-medium tabular-nums sm:text-2xl">
@@ -154,12 +180,12 @@ export function MathQuickGame({ onWin }: GameProps) {
         <span className="text-muted-foreground"> = ?</span>
       </p>
       <div className="space-y-2">
-        <Label htmlFor="math-answer">Resultado</Label>
+        <Label htmlFor="math-answer">{c.result}</Label>
         <Input
           id="math-answer"
           inputMode="none"
           autoComplete="off"
-          placeholder="Número"
+          placeholder={c.placeholder}
           value={value}
           onChange={(e) => {
             setValue(e.target.value.replace(/\D/g, ""))
@@ -177,12 +203,12 @@ export function MathQuickGame({ onWin }: GameProps) {
         <NumericKeypad onDigit={appendDigit} onBackspace={backspace} />
       </div>
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
-        Comprobar
+        {c.check}
       </Button>
       <p
         className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
       >
-        No coincide. Puedes volver a calcular con calma.
+        {c.wrong}
       </p>
     </div>
   )

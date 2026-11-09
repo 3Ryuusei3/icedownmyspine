@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useUi } from "@/i18n/use-ui"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
+import { useLang } from "@/lib/language"
 import type { GameProps } from "@/games/types"
 import { shuffle } from "@/lib/shuffle"
 
@@ -18,6 +20,35 @@ function showDurationMs(count: number) {
   return 1500 + count * 250
 }
 
+const COPY = {
+  es: {
+    won: (n: number, size: number) =>
+      `Recordaste las ${n} casillas en la cuadrícula de ${size}x${size}.`,
+    start: "Pulsa «Empezar» y memoriza las casillas iluminadas.",
+    memorize: (n: number, s: number) => `Memoriza ${n} casillas · ${s} s`,
+    mark: (n: number, sel: number) => `Marca las ${n} casillas: ${sel} / ${n}`,
+    wrong: "No es correcto. Verde: acertadas · Rojo: fallos.",
+    timeLeft: "Tiempo restante para memorizar",
+    grid: "Cuadrícula de memoria",
+    cell: (n: number) => `Casilla ${n}`,
+    check: "Comprobar",
+    retry: "Reintentar",
+  },
+  en: {
+    won: (n: number, size: number) =>
+      `You remembered all ${n} squares on the ${size}x${size} grid.`,
+    start: "Press “Start” and memorize the lit squares.",
+    memorize: (n: number, s: number) => `Memorize ${n} squares · ${s} s`,
+    mark: (n: number, sel: number) => `Mark the ${n} squares: ${sel} / ${n}`,
+    wrong: "Not quite. Green: correct · Red: misses.",
+    timeLeft: "Time left to memorize",
+    grid: "Memory grid",
+    cell: (n: number) => `Square ${n}`,
+    check: "Check",
+    retry: "Retry",
+  },
+}
+
 type Phase = "idle" | "showing" | "input" | "wrong"
 
 function buildPattern(): Set<number> {
@@ -28,6 +59,9 @@ function buildPattern(): Set<number> {
 }
 
 export function MemoryGridGame({ onWin }: GameProps) {
+  const { lang } = useLang()
+  const c = COPY[lang]
+  const ui = useUi()
   const [pattern, setPattern] = useState<Set<number>>(() => new Set())
   const [selected, setSelected] = useState<Set<number>>(() => new Set())
   const [phase, setPhase] = useState<Phase>("idle")
@@ -94,19 +128,19 @@ export function MemoryGridGame({ onWin }: GameProps) {
       selected.size === pattern.size && [...selected].every((i) => pattern.has(i))
     if (ok) {
       onWin?.({
-        solutionText: `Recordaste las ${pattern.size} casillas en la cuadrícula de ${SIZE}x${SIZE}.`,
+        solutionText: c.won(pattern.size, SIZE),
       })
     } else {
       setPhase("wrong")
     }
   }
 
-  let status = "Pulsa «Empezar» y memoriza las casillas iluminadas."
+  let status = c.start
   if (phase === "showing")
-    status = `Memoriza ${pattern.size} casillas · ${Math.ceil(remainingMs / 1000)} s`
+    status = c.memorize(pattern.size, Math.ceil(remainingMs / 1000))
   if (phase === "input")
-    status = `Marca las ${pattern.size} casillas: ${selected.size} / ${pattern.size}`
-  if (phase === "wrong") status = "No es correcto. Verde: acertadas · Rojo: fallos."
+    status = c.mark(pattern.size, selected.size)
+  if (phase === "wrong") status = c.wrong
 
   return (
     <div className="flex flex-col gap-4 max-sm:gap-3">
@@ -123,13 +157,13 @@ export function MemoryGridGame({ onWin }: GameProps) {
         <Progress
           value={phase === "showing" ? (remainingMs / totalMs) * 100 : 0}
           className={phase === "showing" ? undefined : "invisible"}
-          aria-label="Tiempo restante para memorizar"
+          aria-label={c.timeLeft}
         />
       </div>
       <div
         className="mx-auto grid w-full max-w-sm grid-cols-5 gap-1.5 sm:max-w-md sm:gap-2.5"
         role="grid"
-        aria-label="Cuadrícula de memoria"
+        aria-label={c.grid}
       >
         {Array.from({ length: CELLS }, (_, i) => {
           const inPattern = pattern.has(i)
@@ -151,7 +185,7 @@ export function MemoryGridGame({ onWin }: GameProps) {
               key={i}
               type="button"
               role="gridcell"
-              aria-label={`Casilla ${i + 1}`}
+              aria-label={c.cell(i + 1)}
               aria-pressed={isSel}
               disabled={phase === "idle" || phase === "showing"}
               onClick={() => toggle(i)}
@@ -172,15 +206,15 @@ export function MemoryGridGame({ onWin }: GameProps) {
           disabled={phase === "idle"}
           onClick={restart}
         >
-          Reiniciar
+          {ui.playback.reset}
         </Button>
         {phase === "idle" ? (
           <Button type="button" className={ROW_BTN} onClick={start}>
-            Empezar
+            {ui.playback.start}
           </Button>
         ) : phase === "wrong" ? (
           <Button type="button" className={ROW_BTN} onClick={() => show(pattern)}>
-            Reintentar
+            {c.retry}
           </Button>
         ) : (
           <Button
@@ -189,7 +223,7 @@ export function MemoryGridGame({ onWin }: GameProps) {
             disabled={phase !== "input" || selected.size !== pattern.size}
             onClick={check}
           >
-            Comprobar
+            {c.check}
           </Button>
         )}
       </div>

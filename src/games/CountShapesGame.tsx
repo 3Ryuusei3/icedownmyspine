@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { NumericKeypad } from "@/components/numeric-keypad"
 import type { GameProps } from "@/games/types"
+import { useLang } from "@/lib/language"
 import { useStableRandom } from "@/hooks/use-stable-random"
 
 function randomInt(min: number, max: number) {
@@ -20,27 +21,48 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /** Cada entrada: emoji a contar y texto para la pregunta / solución */
+const COPY = {
+  es: {
+    area: "Área con emojis para contar",
+    amount: "Cantidad",
+    placeholder: "Número",
+    check: "Comprobar",
+    wrong: "Cuenta otra vez con tranquilidad.",
+    solution: (count: number, noun: string, emoji: string) =>
+      `Había ${count} ${noun} (${emoji}).`,
+  },
+  en: {
+    area: "Area with emojis to count",
+    amount: "Amount",
+    placeholder: "Number",
+    check: "Check",
+    wrong: "Count again, take your time.",
+    solution: (count: number, noun: string, emoji: string) =>
+      `There were ${count} ${noun} (${emoji}).`,
+  },
+}
+
 const TARGET_TYPES = [
-  { emoji: "🐱", noun: "gatos", question: "¿Cuántos gatos ves?" },
-  { emoji: "🐶", noun: "perros", question: "¿Cuántos perros ves?" },
-  { emoji: "⭐", noun: "estrellas", question: "¿Cuántas estrellas ves?" },
-  { emoji: "🌙", noun: "lunas", question: "¿Cuántas lunas ves?" },
-  { emoji: "🌸", noun: "flores", question: "¿Cuántas flores ves?" },
-  { emoji: "🍎", noun: "manzanas", question: "¿Cuántas manzanas ves?" },
-  { emoji: "🍕", noun: "porciones de pizza", question: "¿Cuántas pizzas ves?" },
-  { emoji: "🎈", noun: "globos", question: "¿Cuántos globos ves?" },
-  { emoji: "🎵", noun: "notas musicales", question: "¿Cuántas notas musicales ves?" },
-  { emoji: "⚽", noun: "balones", question: "¿Cuántos balones ves?" },
-  { emoji: "🦋", noun: "mariposas", question: "¿Cuántas mariposas ves?" },
-  { emoji: "🌈", noun: "arcoíris", question: "¿Cuántos arcoíris ves?" },
-  { emoji: "🍦", noun: "helados", question: "¿Cuántos helados ves?" },
-  { emoji: "🎁", noun: "regalos", question: "¿Cuántos regalos ves?" },
-  { emoji: "🚀", noun: "cohetes", question: "¿Cuántos cohetes ves?" },
-  { emoji: "🐸", noun: "ranas", question: "¿Cuántas ranas ves?" },
-  { emoji: "🍩", noun: "donuts", question: "¿Cuántos donuts ves?" },
-  { emoji: "💧", noun: "gotas", question: "¿Cuántas gotas ves?" },
-  { emoji: "🔔", noun: "campanas", question: "¿Cuántas campanas ves?" },
-  { emoji: "🌻", noun: "girasoles", question: "¿Cuántos girasoles ves?" },
+  { emoji: "🐱", noun: "gatos", question: "¿Cuántos gatos ves?", en: { noun: "cats", question: "How many cats do you see?" } },
+  { emoji: "🐶", noun: "perros", question: "¿Cuántos perros ves?", en: { noun: "dogs", question: "How many dogs do you see?" } },
+  { emoji: "⭐", noun: "estrellas", question: "¿Cuántas estrellas ves?", en: { noun: "stars", question: "How many stars do you see?" } },
+  { emoji: "🌙", noun: "lunas", question: "¿Cuántas lunas ves?", en: { noun: "moons", question: "How many moons do you see?" } },
+  { emoji: "🌸", noun: "flores", question: "¿Cuántas flores ves?", en: { noun: "flowers", question: "How many flowers do you see?" } },
+  { emoji: "🍎", noun: "manzanas", question: "¿Cuántas manzanas ves?", en: { noun: "apples", question: "How many apples do you see?" } },
+  { emoji: "🍕", noun: "porciones de pizza", question: "¿Cuántas pizzas ves?", en: { noun: "pizza slices", question: "How many pizza slices do you see?" } },
+  { emoji: "🎈", noun: "globos", question: "¿Cuántos globos ves?", en: { noun: "balloons", question: "How many balloons do you see?" } },
+  { emoji: "🎵", noun: "notas musicales", question: "¿Cuántas notas musicales ves?", en: { noun: "musical notes", question: "How many musical notes do you see?" } },
+  { emoji: "⚽", noun: "balones", question: "¿Cuántos balones ves?", en: { noun: "balls", question: "How many balls do you see?" } },
+  { emoji: "🦋", noun: "mariposas", question: "¿Cuántas mariposas ves?", en: { noun: "butterflies", question: "How many butterflies do you see?" } },
+  { emoji: "🌈", noun: "arcoíris", question: "¿Cuántos arcoíris ves?", en: { noun: "rainbows", question: "How many rainbows do you see?" } },
+  { emoji: "🍦", noun: "helados", question: "¿Cuántos helados ves?", en: { noun: "ice creams", question: "How many ice creams do you see?" } },
+  { emoji: "🎁", noun: "regalos", question: "¿Cuántos regalos ves?", en: { noun: "presents", question: "How many presents do you see?" } },
+  { emoji: "🚀", noun: "cohetes", question: "¿Cuántos cohetes ves?", en: { noun: "rockets", question: "How many rockets do you see?" } },
+  { emoji: "🐸", noun: "ranas", question: "¿Cuántas ranas ves?", en: { noun: "frogs", question: "How many frogs do you see?" } },
+  { emoji: "🍩", noun: "donuts", question: "¿Cuántos donuts ves?", en: { noun: "donuts", question: "How many donuts do you see?" } },
+  { emoji: "💧", noun: "gotas", question: "¿Cuántas gotas ves?", en: { noun: "drops", question: "How many drops do you see?" } },
+  { emoji: "🔔", noun: "campanas", question: "¿Cuántas campanas ves?", en: { noun: "bells", question: "How many bells do you see?" } },
+  { emoji: "🌻", noun: "girasoles", question: "¿Cuántos girasoles ves?", en: { noun: "sunflowers", question: "How many sunflowers do you see?" } },
 ] as const
 
 const POOL = TARGET_TYPES.map((t) => t.emoji)
@@ -88,6 +110,8 @@ type PlacedEmoji = {
 }
 
 export function CountShapesGame({ onWin }: GameProps) {
+  const { lang } = useLang()
+  const c = COPY[lang]
   const round = useStableRandom(() => {
     const target =
       TARGET_TYPES[Math.floor(Math.random() * TARGET_TYPES.length)]!
@@ -146,7 +170,11 @@ export function CountShapesGame({ onWin }: GameProps) {
     }
     if (n === round.targetCount) {
       onWin?.({
-        solutionText: `Había ${round.targetCount} ${round.target.noun} (${round.target.emoji}).`,
+        solutionText: c.solution(
+          round.targetCount,
+          lang === "en" ? round.target.en.noun : round.target.noun,
+          round.target.emoji,
+        ),
       })
     } else {
       setFeedback("bad")
@@ -156,12 +184,12 @@ export function CountShapesGame({ onWin }: GameProps) {
   return (
     <div className="flex flex-col gap-4 max-sm:gap-2">
       <p className="text-center text-base font-medium text-pretty sm:text-lg">
-        {round.target.question}
+        {lang === "en" ? round.target.en.question : round.target.question}
       </p>
       <div
         className="border-border bg-muted/30 relative mx-auto aspect-[3/2] w-full max-w-md overflow-hidden rounded-xl border sm:aspect-[4/3]"
         role="img"
-        aria-label="Área con emojis para contar"
+        aria-label={c.area}
       >
         {round.placed.map((p) => (
           <span
@@ -175,12 +203,12 @@ export function CountShapesGame({ onWin }: GameProps) {
         ))}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="count-answer">Cantidad</Label>
+        <Label htmlFor="count-answer">{c.amount}</Label>
         <Input
           id="count-answer"
           inputMode="none"
           autoComplete="off"
-          placeholder="Número"
+          placeholder={c.placeholder}
           value={value}
           onChange={(e) => {
             setValue(e.target.value.replace(/\D/g, ""))
@@ -198,12 +226,12 @@ export function CountShapesGame({ onWin }: GameProps) {
         <NumericKeypad onDigit={appendDigit} onBackspace={backspace} />
       </div>
       <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
-        Comprobar
+        {c.check}
       </Button>
       <p
         className={`text-center text-sm text-destructive ${feedback === "bad" ? "" : "invisible"}`}
       >
-        Cuenta otra vez con tranquilidad.
+        {c.wrong}
       </p>
     </div>
   )
