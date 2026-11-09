@@ -194,36 +194,36 @@
 
 /* Lavanda: morado muy suave */
 .lavanda {
-  --background: oklch(0.978 0.01 300);
+  --background: oklch(0.942 0.024 300);
   --foreground: oklch(0.28 0.04 295);
-  --card: oklch(0.995 0.004 300);
+  --card: oklch(0.974 0.014 300);
   --card-foreground: oklch(0.28 0.04 295);
-  --popover: oklch(0.995 0.004 300);
+  --popover: oklch(0.974 0.014 300);
   --popover-foreground: oklch(0.28 0.04 295);
   --primary: oklch(0.47 0.1 295);
   --primary-foreground: oklch(0.985 0.008 300);
-  --secondary: oklch(0.95 0.02 300);
+  --secondary: oklch(0.912 0.032 300);
   --secondary-foreground: oklch(0.35 0.07 295);
-  --muted: oklch(0.95 0.018 300);
-  --muted-foreground: oklch(0.5 0.04 295);
-  --accent: oklch(0.94 0.026 300);
+  --muted: oklch(0.912 0.03 300);
+  --muted-foreground: oklch(0.46 0.05 295);
+  --accent: oklch(0.895 0.04 300);
   --accent-foreground: oklch(0.35 0.07 295);
   --destructive: oklch(0.58 0.17 15);
-  --border: oklch(0.91 0.022 300);
-  --input: oklch(0.91 0.022 300);
+  --border: oklch(0.862 0.034 300);
+  --input: oklch(0.862 0.034 300);
   --ring: oklch(0.7 0.1 295);
   --chart-1: oklch(0.88 0.04 300);
   --chart-2: oklch(0.7 0.09 297);
   --chart-3: oklch(0.57 0.1 295);
   --chart-4: oklch(0.47 0.1 295);
   --chart-5: oklch(0.35 0.07 295);
-  --sidebar: oklch(0.978 0.01 300);
+  --sidebar: oklch(0.942 0.024 300);
   --sidebar-foreground: oklch(0.28 0.04 295);
   --sidebar-primary: oklch(0.47 0.1 295);
   --sidebar-primary-foreground: oklch(0.985 0.008 300);
-  --sidebar-accent: oklch(0.94 0.026 300);
+  --sidebar-accent: oklch(0.895 0.04 300);
   --sidebar-accent-foreground: oklch(0.35 0.07 295);
-  --sidebar-border: oklch(0.91 0.022 300);
+  --sidebar-border: oklch(0.862 0.034 300);
   --sidebar-ring: oklch(0.7 0.1 295);
 }
 
@@ -292,3 +292,98 @@ html {
   backface-visibility: hidden;
 }
 
+/* Soltar pensamientos: sube sin pausas, se mece de lado a lado, se
+   desvanece antes de llegar arriba y hace «pop». */
+@keyframes float-up {
+  from {
+    bottom: 0.5rem;
+  }
+  to {
+    bottom: calc(100% - 6.5rem);
+  }
+}
+
+@keyframes sway {
+  from {
+    transform: translateX(-1.1rem) rotate(-2deg);
+  }
+  to {
+    transform: translateX(1.1rem) rotate(2deg);
+  }
+}
+
+@keyframes fade-soft {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.12;
+    filter: blur(2px);
+  }
+}
+
+@keyframes pop-glow {
+  from {
+    transform: scale(0.3);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes pop-ring {
+  from {
+    transform: scale(0.4);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes pop-ray {
+  from {
+    transform: rotate(var(--a)) translateY(-1.5rem) scaleY(1);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--a)) translateY(-3.6rem) scaleY(0.3);
+    opacity: 0;
+  }
+}
+
+.animate-float-up {
+  animation: float-up 6s linear forwards;
+}
+
+.animate-sway {
+  animation: sway 2.8s ease-in-out infinite alternate;
+}
+
+.animate-fade-soft {
+  animation: fade-soft 6s linear forwards;
+}
+
+.animate-pop-glow {
+  animation: pop-glow 0.6s ease-out forwards;
+}
+
+.animate-pop-ring {
+  animation: pop-ring 0.6s ease-out forwards;
+}
+
+/* Segundo aro, con retraso: termina el último y marca el fin del pop. */
+.animate-pop-ring-late {
+  animation: pop-ring 0.6s ease-out 0.12s both;
+}
+
+.animate-pop-ray {
+  animation: pop-ray 0.6s ease-out forwards;
+}

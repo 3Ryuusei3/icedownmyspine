@@ -99,8 +99,8 @@ export function Home() {
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-            <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
             <SettingsDialog enabled={enabled} onChange={setEnabled} />
+            <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
             <PalettePicker />
           </div>
         </header>

@@ -44,8 +44,8 @@ export const PALETTES: Palette[] = [
   {
     id: "lavanda",
     name: "Lavanda",
-    background: "oklch(0.978 0.01 300)",
+    background: "oklch(0.942 0.024 300)",
     accent: "oklch(0.47 0.1 295)",
-    themeColor: "#f7f5fb",
+    themeColor: "#ebe6f4",
   },
 ]

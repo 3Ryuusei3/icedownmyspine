@@ -8,13 +8,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { GAMES, type GameId } from "@/lib/gameRegistry"
+import {
+  CATEGORY_LABELS,
+  GAMES,
+  type GameCategory,
+  type GameId,
+} from "@/lib/gameRegistry"
 import { LayoutGrid } from "lucide-react"
 
 type GamePickerProps = {
   currentId: GameId
   onSelect: (id: GameId) => void
 }
+
+const CATEGORIES: GameCategory[] = ["game", "relax"]
 
 export function GamePicker({ currentId, onSelect }: GamePickerProps) {
   const [open, setOpen] = useState(false)
@@ -42,27 +49,34 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
             Elige uno; se cargará una partida nueva.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
-          {GAMES.map((g) => (
-            <Button
-              key={g.id}
-              type="button"
-              variant={g.id === currentId ? "secondary" : "outline"}
-              className="min-h-14 h-auto flex-col gap-0.5 whitespace-normal px-2 py-2 text-center text-xs leading-tight font-medium sm:min-h-16 sm:gap-1 sm:py-3 sm:text-sm"
-              onClick={() => {
-                onSelect(g.id)
-                setOpen(false)
-              }}
-            >
-              <span>{g.title}</span>
-              {g.id === currentId ? (
-                <span className="text-muted-foreground text-xs font-normal">
-                  Actual
-                </span>
-              ) : null}
-            </Button>
-          ))}
-        </div>
+        {CATEGORIES.map((category) => (
+          <section key={category} className="flex flex-col gap-2">
+            <h3 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              {CATEGORY_LABELS[category]}
+            </h3>
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
+              {GAMES.filter((g) => g.category === category).map((g) => (
+                <Button
+                  key={g.id}
+                  type="button"
+                  variant={g.id === currentId ? "secondary" : "outline"}
+                  className="min-h-14 h-auto flex-col gap-0.5 whitespace-normal px-2 py-2 text-center text-xs leading-tight font-medium sm:min-h-16 sm:gap-1 sm:py-3 sm:text-sm"
+                  onClick={() => {
+                    onSelect(g.id)
+                    setOpen(false)
+                  }}
+                >
+                  <span>{g.title}</span>
+                  {g.id === currentId ? (
+                    <span className="text-muted-foreground text-xs font-normal">
+                      Actual
+                    </span>
+                  ) : null}
+                </Button>
+              ))}
+            </div>
+          </section>
+        ))}
       </DialogContent>
     </Dialog>
   )

@@ -9,6 +9,8 @@ import { MemoryPairsGame } from "@/games/MemoryPairsGame";
 import { OrderTapGame } from "@/games/OrderTapGame";
 import { SequenceGame } from "@/games/SequenceGame";
 import { Sudoku9Game } from "@/games/Sudoku9Game";
+import { BreathingGame } from "@/games/BreathingGame";
+import { ReleaseThoughtsGame } from "@/games/ReleaseThoughtsGame";
 import { SimonGame } from "@/games/SimonGame";
 import { MemoryGridGame } from "@/games/MemoryGridGame";
 import type { GameProps } from "@/games/types";
@@ -25,7 +27,9 @@ export type GameId =
   | "categoryNames"
   | "compareNumbers"
   | "simon"
-  | "memoryGrid";
+  | "memoryGrid"
+  | "breathing"
+  | "letGo";
 
 export type GameCategory = "game" | "relax";
 
@@ -131,10 +135,26 @@ export const GAMES: GameDefinition[] = [
   {
     id: "memoryGrid",
     category: "game",
-    title: "Recuerda la cuadrícula",
+    title: "Cuadriculado",
     description:
       "Se iluminan entre 5 y 15 casillas de una cuadrícula de 5x5. Memorízalas y márcalas cuando se apaguen.",
     component: MemoryGridGame,
+  },
+  {
+    id: "breathing",
+    category: "relax",
+    title: "Respiración guiada",
+    description:
+      "Sigue el círculo: inhala mientras se hincha, mantén el aire y exhala mientras se encoge. Antes de empezar puedes ajustar los segundos, si quieres pausa y el número de respiraciones. Puedes pausarlo cuando lo necesites.",
+    component: BreathingGame,
+  },
+  {
+    id: "letGo",
+    category: "relax",
+    title: "Soltar pensamientos",
+    description:
+      "Escribe algo que te ronde la cabeza y pulsa «Soltar»: se irá flotando hasta desvanecerse. No se guarda nada. Suelta los que quieras.",
+    component: ReleaseThoughtsGame,
   },
 ];
 

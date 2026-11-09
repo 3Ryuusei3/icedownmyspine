@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react"
 import { GAMES, type GameId } from "@/lib/gameRegistry"
 
-const STORAGE_KEY = "ice-rotation"
+/** Guardamos los juegos desactivados: así los juegos nuevos entran solos. */
+const STORAGE_KEY = "ice-rotation-off"
 
 const ALL_IDS: GameId[] = GAMES.map((g) => g.id)
 
@@ -11,7 +12,7 @@ function load(): GameId[] {
     if (raw) {
       const parsed: unknown = JSON.parse(raw)
       if (Array.isArray(parsed)) {
-        const valid = ALL_IDS.filter((id) => parsed.includes(id))
+        const valid = ALL_IDS.filter((id) => !parsed.includes(id))
         if (valid.length > 0) return valid
       }
     }
@@ -30,7 +31,10 @@ export function useRotation() {
     if (next.length === 0) return
     setEnabledState(next)
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(ALL_IDS.filter((id) => !next.includes(id))),
+      )
     } catch {
       // se aplica igualmente en esta sesión
     }
