@@ -62,6 +62,8 @@ const es = {
       "Solo se guardan en este dispositivo y no se pueden exportar. Donde ves un tiempo, es tu mejor marca.",
     totalLabel: "Total",
     times: (n: number) => (n === 1 ? "1 vez" : `${n} veces`),
+    thoughts: (n: number) =>
+      n === 1 ? "1 pensamiento" : `${n} pensamientos`,
     never: "Sin jugar aún",
     best: "Mejor tiempo",
     reset: "Borrar estadísticas",
@@ -150,6 +152,7 @@ const en: UiText = {
       "Saved only on this device and can't be exported. Where you see a time, it's your best.",
     totalLabel: "Total",
     times: (n) => (n === 1 ? "1 time" : `${n} times`),
+    thoughts: (n) => (n === 1 ? "1 thought" : `${n} thoughts`),
     never: "Not played yet",
     best: "Best time",
     reset: "Clear stats",

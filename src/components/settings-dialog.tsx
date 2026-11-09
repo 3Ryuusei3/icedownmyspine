@@ -269,7 +269,11 @@ function DataTab() {
                 >
                   <span className="min-w-0 truncate">{g.text[lang].title}</span>
                   <span className="text-muted-foreground shrink-0 text-right text-xs tabular-nums">
-                    {s ? ui.data.times(s.plays) : ui.data.never}
+                    {s
+                      ? g.id === "letGo"
+                        ? ui.data.thoughts(s.plays)
+                        : ui.data.times(s.plays)
+                      : ui.data.never}
                     {s?.bestMs !== undefined
                       ? ` · ${formatDuration(s.bestMs)}`
                       : ""}
