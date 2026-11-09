@@ -239,7 +239,7 @@ export function Home() {
           <Button
             type="button"
             variant="secondary"
-            className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
+            className="min-h-12 min-w-0 flex-1 px-2 text-base sm:min-h-14 sm:px-3 sm:text-lg"
             onClick={replayCurrentGame}
             aria-label={ui.repeatGameAria}
           >
@@ -247,7 +247,7 @@ export function Home() {
           </Button>
           <Button
             type="button"
-            className="min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
+            className="min-h-12 min-w-0 flex-1 px-2 text-base sm:min-h-14 sm:px-3 sm:text-lg"
             onClick={swapGame}
             aria-label={ui.playAnotherAria}
           >

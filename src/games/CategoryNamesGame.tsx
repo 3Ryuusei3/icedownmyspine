@@ -170,7 +170,7 @@ export function CategoryNamesGame({ onWin }: GameProps) {
         </div>
       </div>
 
-      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
+      <Button type="button" className="min-h-10 w-full text-sm sm:min-h-11 sm:text-base" onClick={check}>
         {t.done}
       </Button>
       <p

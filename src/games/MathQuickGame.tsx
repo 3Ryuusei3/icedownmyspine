@@ -202,7 +202,7 @@ export function MathQuickGame({ onWin }: GameProps) {
         />
         <NumericKeypad onDigit={appendDigit} onBackspace={backspace} />
       </div>
-      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={check}>
+      <Button type="button" className="min-h-10 w-full text-sm sm:min-h-11 sm:text-base" onClick={check}>
         {c.check}
       </Button>
       <p

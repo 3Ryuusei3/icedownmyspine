@@ -65,7 +65,7 @@ const LIT_MS = 400
 const PRESS_MS = 220
 const PRESS_GAP_MS = 70
 
-const BTN = "min-h-10 w-full sm:min-h-11"
+const BTN = "min-h-10 w-full text-sm sm:min-h-11 sm:text-base"
 const ROW_BTN =
   "min-h-10 min-w-0 flex-1 px-2 text-sm sm:min-h-11 sm:px-3 sm:text-base"
 

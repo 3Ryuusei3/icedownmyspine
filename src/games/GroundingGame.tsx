@@ -122,7 +122,7 @@ export function GroundingGame({ onComplete }: GameProps) {
         <Button
           type="button"
           variant="secondary"
-          className="min-h-10 w-full sm:min-h-11"
+          className="min-h-10 w-full text-sm sm:min-h-11 sm:text-base"
           onClick={() => {
             setStepIndex(0)
             setValues({})
@@ -166,7 +166,7 @@ export function GroundingGame({ onComplete }: GameProps) {
           </div>
         ))}
       </div>
-      <Button type="button" className="min-h-10 w-full sm:min-h-11" onClick={next}>
+      <Button type="button" className="min-h-10 w-full text-sm sm:min-h-11 sm:text-base" onClick={next}>
         {stepIndex < STEPS.length - 1 ? c.next : c.finish}
       </Button>
     </div>

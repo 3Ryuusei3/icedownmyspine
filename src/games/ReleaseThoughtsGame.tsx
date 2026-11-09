@@ -129,7 +129,7 @@ export function ReleaseThoughtsGame({ onComplete }: GameProps) {
 
       <Button
         type="button"
-        className="min-h-10 w-full sm:min-h-11"
+        className="min-h-10 w-full text-sm sm:min-h-11 sm:text-base"
         disabled={!canRelease}
         onClick={release}
       >

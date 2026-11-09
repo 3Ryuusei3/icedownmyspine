@@ -5,9 +5,9 @@ const es = {
   documentTitle: "Hielo por la espalda",
   subtitle:
     "Minijuegos sencillos para desviar la atención. No hay puntuación ni prisa.",
-  repeatGame: "Repetir juego",
+  repeatGame: "Repetir",
   repeatGameAria: "Volver a jugar a este juego",
-  playAnother: "Jugar a otro",
+  playAnother: "Cambiar a otro",
   playAnotherAria: "Jugar a otro juego",
   winTitle: "¡Muy bien!",
   winDescription:
@@ -93,9 +93,9 @@ const en: UiText = {
   documentTitle: "Ice Down Your Spine",
   subtitle:
     "Simple mini-games to take your mind off things. No scores, no rush.",
-  repeatGame: "Restart game",
+  repeatGame: "Repeat",
   repeatGameAria: "Play this game again",
-  playAnother: "Play another",
+  playAnother: "Switch game",
   playAnotherAria: "Play a different game",
   winTitle: "Well done!",
   winDescription:
