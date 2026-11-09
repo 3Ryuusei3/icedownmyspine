@@ -406,7 +406,7 @@ html {
     bottom: 0.5rem;
   }
   to {
-    bottom: calc(100% - 6.5rem);
+    bottom: calc(100% - 8rem);
   }
 }
 
@@ -433,13 +433,14 @@ html {
   }
 }
 
-@keyframes pop-glow {
+/* «Pop» tipo fuegos artificiales: destello, ondas, rayos, chispas con caída y brillos. */
+@keyframes pop-flash {
   from {
-    transform: scale(0.3);
-    opacity: 0.6;
+    transform: scale(0.2);
+    opacity: 0.95;
   }
   to {
-    transform: scale(1.7);
+    transform: scale(1.5);
     opacity: 0;
   }
 }
@@ -450,20 +451,92 @@ html {
     opacity: 0.85;
   }
   to {
-    transform: scale(2.4);
+    transform: scale(2.8);
     opacity: 0;
   }
 }
 
 @keyframes pop-ray {
-  from {
-    transform: rotate(var(--a)) translateY(-1.5rem) scaleY(1);
+  0% {
+    transform: rotate(var(--a)) translateY(-0.8rem) scaleY(0.3);
     opacity: 1;
   }
-  to {
-    transform: rotate(var(--a)) translateY(-3.6rem) scaleY(0.3);
+  25% {
+    transform: rotate(var(--a)) translateY(calc(var(--r) * -0.45)) scaleY(1.6);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--a)) translateY(calc(var(--r) * -1)) scaleY(0.2);
     opacity: 0;
   }
+}
+
+@keyframes pop-spark {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(var(--dx), var(--dy)) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), calc(var(--dy) + 1.6rem)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+@keyframes pop-twinkle {
+  0% {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+  35% {
+    transform: translate(var(--dx), var(--dy)) scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Marca el final del pop (el elemento no se ve). */
+@keyframes pop-end {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-pop-flash {
+  animation: pop-flash 0.35s ease-out forwards;
+}
+
+.animate-pop-ring {
+  animation: pop-ring 0.7s ease-out forwards;
+}
+
+.animate-pop-ring-late {
+  animation: pop-ring 0.7s ease-out 0.14s both;
+}
+
+.animate-pop-ray {
+  animation: pop-ray 0.85s cubic-bezier(0.15, 0.7, 0.3, 1) both;
+}
+
+.animate-pop-spark {
+  animation: pop-spark 1.05s cubic-bezier(0.2, 0.6, 0.3, 1) both;
+}
+
+.animate-pop-twinkle {
+  animation: pop-twinkle 0.55s ease-in-out both;
+}
+
+.animate-pop-end {
+  animation: pop-end 1.15s linear forwards;
 }
 
 .animate-float-up {

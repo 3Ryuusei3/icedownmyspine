@@ -143,6 +143,7 @@ export const GAMES: GameDefinition[] = [
   {
     id: "letGo",
     category: "relax",
+    statusLine: true,
     text: {
       es: {
         title: "Soltar pensamientos",
