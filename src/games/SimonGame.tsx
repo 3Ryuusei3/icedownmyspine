@@ -61,6 +61,9 @@ const COPY = {
 
 const STEP_MS = 650
 const LIT_MS = 400
+/** Duración del destello al pulsar y pausa previa para que un clic repetido se note. */
+const PRESS_MS = 220
+const PRESS_GAP_MS = 70
 
 const BTN = "min-h-10 w-full sm:min-h-11"
 const ROW_BTN =
@@ -83,10 +86,13 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
   const [inputIdx, setInputIdx] = useState(0)
 
   const timeouts = useRef<ReturnType<typeof setTimeout>[]>([])
+  const pressTimers = useRef<ReturnType<typeof setTimeout>[]>([])
 
   const clearTimers = useCallback(() => {
     timeouts.current.forEach(clearTimeout)
     timeouts.current = []
+    pressTimers.current.forEach(clearTimeout)
+    pressTimers.current = []
   }, [])
 
   useEffect(() => clearTimers, [clearTimers])
@@ -102,6 +108,19 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
     },
     [later],
   )
+
+  /**
+   * Destello al pulsar un color. Reinicia el anterior: si pulsas varias veces
+   * seguidas el mismo color, se apaga un instante y vuelve a encenderse.
+   */
+  const flashPress = useCallback((pad: number) => {
+    pressTimers.current.forEach(clearTimeout)
+    setLit(null)
+    pressTimers.current = [
+      setTimeout(() => setLit(pad), PRESS_GAP_MS),
+      setTimeout(() => setLit(null), PRESS_GAP_MS + PRESS_MS),
+    ]
+  }, [])
 
   const playLevel = useCallback(
     (lvl: number) => {
@@ -130,7 +149,7 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
 
   function onPad(pad: number) {
     if (phase !== "input") return
-    flash(pad)
+    flashPress(pad)
     if (pad !== sequence[inputIdx]) {
       setPhase("failed")
       return
@@ -193,7 +212,7 @@ export function SimonGame({ onWin, onSwapGame }: GameProps) {
             disabled={phase !== "input"}
             onClick={() => onPad(i)}
             className={cn(
-              "aspect-square rounded-2xl transition-all duration-150 active:scale-95 disabled:cursor-default",
+              "aspect-square rounded-2xl transition-all duration-100 active:scale-95 disabled:cursor-default",
               lit === i ? p.lit : p.idle,
               lit === i && "scale-[1.03]",
             )}
