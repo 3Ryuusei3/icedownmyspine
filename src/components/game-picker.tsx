@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
@@ -22,11 +22,13 @@ import { LayoutGrid } from "lucide-react"
 type GamePickerProps = {
   currentId: GameId
   onSelect: (id: GameId) => void
+  /** Botón que abre el catálogo; por defecto, un botón con icono. */
+  trigger?: ReactNode
 }
 
 const CATEGORIES: GameCategory[] = ["game", "relax"]
 
-export function GamePicker({ currentId, onSelect }: GamePickerProps) {
+export function GamePicker({ currentId, onSelect, trigger }: GamePickerProps) {
   const [open, setOpen] = useState(false)
   const ui = useUi()
   const { lang } = useLang()
@@ -34,15 +36,17 @@ export function GamePicker({ currentId, onSelect }: GamePickerProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon-lg"
-          className="size-9 min-h-9 min-w-9 shrink-0 sm:size-11 sm:min-h-11 sm:min-w-11"
-          aria-label={ui.picker.aria}
-        >
-          <LayoutGrid className="size-4 sm:size-5" aria-hidden />
-        </Button>
+        {trigger ?? (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-lg"
+            className="size-9 min-h-9 min-w-9 shrink-0 sm:size-11 sm:min-h-11 sm:min-w-11"
+            aria-label={ui.picker.aria}
+          >
+            <LayoutGrid className="size-4 sm:size-5" aria-hidden />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent
         className="max-h-[90vh] gap-4 overflow-y-auto sm:max-w-lg"

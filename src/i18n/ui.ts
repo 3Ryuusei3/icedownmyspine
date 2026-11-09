@@ -15,6 +15,12 @@ const es = {
   repeat: "Repetir",
   another: "Otro",
 
+  home: {
+    play: "Jugar",
+    catalog: "Catálogo",
+    settings: "Ajustes",
+  },
+
   categories: { game: "Juegos", relax: "Relajación" },
 
   picker: {
@@ -40,6 +46,8 @@ const es = {
     description: "Personaliza la app.",
     tabs: { general: "General", rotation: "Rotación", data: "Datos" },
     colors: "Colores",
+    home: "Inicio",
+    goHome: "Volver a la pantalla de inicio",
     language: "Idioma",
     all: "Todos",
     games: "Juegos",
@@ -95,6 +103,12 @@ const en: UiText = {
   repeat: "Again",
   another: "Another",
 
+  home: {
+    play: "Play",
+    catalog: "Catalog",
+    settings: "Settings",
+  },
+
   categories: { game: "Games", relax: "Relaxation" },
 
   picker: {
@@ -120,6 +134,8 @@ const en: UiText = {
     description: "Customize the app.",
     tabs: { general: "General", rotation: "Rotation", data: "Data" },
     colors: "Colors",
+    home: "Home",
+    goHome: "Back to the home screen",
     language: "Language",
     all: "All",
     games: "Games",

@@ -1,6 +1,6 @@
 import { Check, Settings } from "lucide-react"
 import { useTheme } from "next-themes"
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
@@ -27,6 +27,10 @@ type SettingsDialogProps = {
   enabled: GameId[]
   onChange: (ids: GameId[]) => void
   onLanguageChange: (lang: Lang) => void
+  /** Botón que abre los ajustes; por defecto, un botón con icono. */
+  trigger?: ReactNode
+  /** Si se indica, la pestaña General muestra un botón para volver a la home. */
+  onGoHome?: () => void
 }
 
 const idsOf = (category?: GameCategory) =>
@@ -116,11 +120,27 @@ function LanguageSection({
 
 function GeneralTab({
   onLanguageChange,
-}: Pick<SettingsDialogProps, "onLanguageChange">) {
+  onGoHome,
+}: Pick<SettingsDialogProps, "onLanguageChange" | "onGoHome">) {
+  const ui = useUi()
+
   return (
     <div className="flex flex-col gap-5">
       <ColorsSection />
       <LanguageSection onLanguageChange={onLanguageChange} />
+      {onGoHome ? (
+        <section className="flex flex-col gap-2">
+          <h3 className="text-sm font-medium">{ui.settings.home}</h3>
+          <Button
+            type="button"
+            variant="secondary"
+            className="min-h-10 w-full text-sm sm:min-h-11"
+            onClick={onGoHome}
+          >
+            {ui.settings.goHome}
+          </Button>
+        </section>
+      ) : null}
     </div>
   )
 }
@@ -316,15 +336,17 @@ export function SettingsDialog(props: SettingsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon-lg"
-          className="size-9 min-h-9 min-w-9 shrink-0 sm:size-11 sm:min-h-11 sm:min-w-11"
-          aria-label={ui.settings.aria}
-        >
-          <Settings className="size-4 sm:size-5" aria-hidden />
-        </Button>
+        {props.trigger ?? (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-lg"
+            className="size-9 min-h-9 min-w-9 shrink-0 sm:size-11 sm:min-h-11 sm:min-w-11"
+            aria-label={ui.settings.aria}
+          >
+            <Settings className="size-4 sm:size-5" aria-hidden />
+          </Button>
+        )}
       </DialogTrigger>
       {/* Altura fija: al cambiar de pestaña el diálogo no cambia de tamaño. */}
       <DialogContent
@@ -343,7 +365,17 @@ export function SettingsDialog(props: SettingsDialogProps) {
             <TabsTrigger value="data">{ui.settings.tabs.data}</TabsTrigger>
           </TabsList>
           <TabsContent value="general">
-            <GeneralTab onLanguageChange={props.onLanguageChange} />
+            <GeneralTab
+              onLanguageChange={props.onLanguageChange}
+              onGoHome={
+                props.onGoHome
+                  ? () => {
+                      setOpen(false)
+                      props.onGoHome?.()
+                    }
+                  : undefined
+              }
+            />
           </TabsContent>
           <TabsContent value="rotation">
             <RotationTab enabled={props.enabled} onChange={props.onChange} />

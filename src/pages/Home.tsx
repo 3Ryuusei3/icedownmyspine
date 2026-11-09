@@ -2,13 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GamePicker } from "@/components/game-picker";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -21,12 +15,24 @@ import { useRotation } from "@/hooks/use-rotation";
 import { useUi } from "@/i18n/use-ui";
 import { useLang, type Lang } from "@/lib/language";
 import { recordPlay } from "@/lib/stats";
+import { StartScreen } from "@/pages/StartScreen";
 import {
   getGameById,
   isAvailable,
   pickRandomGame,
   type GameId,
 } from "@/lib/gameRegistry";
+
+const HOME_SEEN_KEY = "ice-home-seen";
+
+/** Una vez vista la home, las siguientes veces la app abre directamente un juego al azar. */
+function hasSeenHome() {
+  try {
+    return localStorage.getItem(HOME_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 export function Home() {
   const { lang, setLang } = useLang();
@@ -35,6 +41,9 @@ export function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- solo la partida inicial
   const initial = useMemo(() => pickRandomGame(undefined, enabled, lang), []);
   const [gameId, setGameId] = useState<GameId>(initial.id);
+  const [screen, setScreen] = useState<"home" | "game">(() =>
+    hasSeenHome() ? "game" : "home",
+  );
   const [session, setSession] = useState(0);
   const [replayNonce, setReplayNonce] = useState(0);
   const [winOpen, setWinOpen] = useState(false);
@@ -69,6 +78,30 @@ export function Home() {
   const selectGameFromMenu = useCallback((id: GameId) => {
     setGameId(id);
     setSession((s) => s + 1);
+    setScreen("game");
+  }, []);
+
+  // Desde la home: un juego al azar de la rotación.
+  const startRandom = useCallback(() => {
+    const next = pickRandomGame(gameId, enabled, lang);
+    setGameId(next.id);
+    setSession((s) => s + 1);
+    setScreen("game");
+  }, [gameId, enabled, lang]);
+
+  useEffect(() => {
+    if (screen !== "home") return;
+    try {
+      localStorage.setItem(HOME_SEEN_KEY, "1");
+    } catch {
+      // sin almacenamiento: la home se mostrará siempre
+    }
+  }, [screen]);
+
+  const goHome = useCallback(() => {
+    setWinOpen(false);
+    setWinSolution(null);
+    setScreen("home");
   }, []);
 
   const startedAt = useRef(Date.now());
@@ -114,48 +147,54 @@ export function Home() {
     setSession((s) => s + 1);
   }, [gameId, enabled, lang]);
 
+  if (screen === "home") {
+    return (
+      <div className="bg-background text-foreground">
+        <StartScreen
+          currentId={gameId}
+          enabled={enabled}
+          onSelectGame={selectGameFromMenu}
+          onRotationChange={setEnabled}
+          onLanguageChange={changeLanguage}
+          onPlay={startRandom}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-background text-foreground flex min-h-svh flex-col">
       <div className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col px-3 py-3 sm:px-6 sm:py-10">
-        <header className="mb-3 flex shrink-0 flex-wrap items-start justify-between gap-2 sm:mb-6 sm:gap-4">
-          <div className="min-w-0 flex-1 text-left">
-            <div className="flex items-center gap-2 sm:gap-3">
+        <header className="mb-3 shrink-0 sm:mb-6">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <img
                 src="/icon-192.png"
                 alt=""
                 aria-hidden
                 className="size-6 shrink-0 rotate-[15deg] sm:size-8"
               />
-              <h1 className="text-balance text-xl font-semibold tracking-tight sm:text-3xl">
-                Ice Down Your Spine
+              <h1 className="min-w-0 text-balance text-lg font-semibold tracking-tight sm:text-2xl">
+                {gameText.title}
               </h1>
             </div>
-            <p className="text-muted-foreground mt-1 max-w-md text-pretty text-xs leading-snug sm:mt-2 sm:text-sm sm:leading-relaxed">
-              {ui.subtitle}
-            </p>
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
+              <SettingsDialog
+                enabled={enabled}
+                onChange={setEnabled}
+                onLanguageChange={changeLanguage}
+                onGoHome={goHome}
+              />
+            </div>
           </div>
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-            <GamePicker currentId={gameId} onSelect={selectGameFromMenu} />
-            <SettingsDialog
-              enabled={enabled}
-              onChange={setEnabled}
-              onLanguageChange={changeLanguage}
-            />
-          </div>
+          <p className="text-muted-foreground mt-2 text-pretty text-xs leading-snug sm:text-sm sm:leading-relaxed">
+            {gameText.description}
+          </p>
         </header>
 
         <div className="-mx-1 flex min-h-0 flex-1 flex-col overflow-y-auto px-1 [-webkit-overflow-scrolling:touch]">
           <div className="mx-auto my-auto flex w-full min-w-0 flex-col gap-2 py-1 sm:gap-4 sm:py-2">
-            <Card className="border-border/60 bg-muted/50 max-sm:gap-2 max-sm:py-3 shrink-0 shadow-sm dark:bg-muted/25 sm:gap-4 sm:py-4">
-              <CardHeader className="space-y-1 max-sm:px-3 max-sm:pb-2 pb-4 sm:px-4">
-                <CardTitle className="text-lg sm:text-xl">
-                  {gameText.title}
-                </CardTitle>
-                <CardDescription className="text-muted-foreground max-sm:text-xs max-sm:leading-snug leading-relaxed">
-                  {gameText.description}
-                </CardDescription>
-              </CardHeader>
-            </Card>
             <Card className="max-sm:gap-2 max-sm:py-3 shrink-0 overflow-hidden shadow-sm sm:gap-4 sm:py-4">
               <CardContent className="max-sm:px-3 sm:px-4">
                 <div className="flex flex-col items-center px-1 py-1 sm:px-2 sm:py-2">
